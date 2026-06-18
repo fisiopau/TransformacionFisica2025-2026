@@ -1863,12 +1863,12 @@ html.dark select.input { background: var(--surface); }
 // CONSTANTS & DATA
 // ══════════════════════════════════════════
 
-const START_DATE = new Date('2025-06-15');
-const END_DATE   = new Date('2026-03-11');
+const START_DATE = new Date('2026-06-18');
+const END_DATE   = new Date('2027-01-13');
 
 const PHASES = [
-  { name: 'F1 · Recomposición',    end: new Date('2025-08-16'), kcal: 2450, p: 170, c: 250, f: 85 },
-  { name: 'F2 · Volumen Limpio',   end: new Date('2025-11-07'), kcal: 2650, p: 175, c: 310, f: 88 },
+  { name: 'F1 · Recomposición',    end: new Date('2026-08-13'), kcal: 2450, p: 170, c: 250, f: 85 },
+  { name: 'F2 · Volumen Limpio',   end: new Date('2026-09-10'), kcal: 2650, p: 175, c: 310, f: 88 },
   { name: 'F3 · Definición+Hyrox', end: END_DATE,              kcal: 2350, p: 175, c: 215, f: 88 },
 ];
 
@@ -4767,12 +4767,12 @@ function importData() {
 // PLAN STATE UNIFICADO
 // ══════════════════════════════════════════
 
-const PLAN_START = new Date('2025-06-15T00:00:00');
-const PLAN_END   = new Date('2026-03-11T00:00:00');
+const PLAN_START = new Date('2026-06-18T00:00:00');
+const PLAN_END   = new Date('2027-01-13T00:00:00');
 const PLAN_PHASES_EXT = [
-  { num: 1, nombre: 'Recomposición',    end: new Date('2025-08-16'), dias: 63,  color: '#f97316' },
-  { num: 2, nombre: 'Volumen Limpio',   end: new Date('2025-11-07'), dias: 84,  color: '#3b82f6' },
-  { num: 3, nombre: 'Definición+Hyrox', end: new Date('2026-03-11'), dias: 124, color: '#a855f7' },
+  { num: 1, nombre: 'Recomposición',    end: new Date('2026-08-13'), dias: 56,  color: '#f97316' },
+  { num: 2, nombre: 'Volumen Limpio',   end: new Date('2026-09-10'), dias: 28,  color: '#3b82f6' },
+  { num: 3, nombre: 'Definición+Hyrox', end: new Date('2027-01-13'), dias: 125, color: '#a855f7' },
 ];
 
 function isDeloadWeek(week) { return week > 0 && week % 4 === 0; }
@@ -5577,12 +5577,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Seed biométricos de evaluación inicial si el array está vacío
   if (!getBio().length) {
-    addBio({ fecha: '2025-06-15', peso: 74.65, grasa: 16.9, hrv: 39, fc: null, sueno: null, _seed: true });
+    addBio({ fecha: '2026-06-18', peso: 74.65, grasa: 16.9, hrv: 39, fc: null, sueno: null, _seed: true });
   }
   // Seed check-in inicial si no hay ninguno
   if (!getCheckins().length) {
     addCheckin({
-      fecha: '2025-06-15', semana: 1,
+      fecha: '2026-06-18', semana: 1,
       peso: 74.65, grasa: 16.9, musculo: 62.5, hrv: 39, fc: null, sueno: null,
       cintura: 84, pasos: null,
       ejercicios: {
