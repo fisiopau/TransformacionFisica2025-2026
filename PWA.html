@@ -812,22 +812,6 @@ html.dark select.input { background: var(--surface); }
   <!-- Biométricos rápidos -->
   <div class="section-title">Biométricos Rápidos</div>
   <div class="card" style="margin:0 16px;">
-    <!-- Apple Health sync banner — iOS only -->
-    <div id="health-sync-banner" style="display:none;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid var(--border);gap:10px;">
-      <div style="display:flex;align-items:center;gap:8px;flex:1;min-width:0;">
-        <!-- Apple Health heart icon -->
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" style="flex-shrink:0;">
-          <path d="M12 21.593c-5.63-5.539-11-10.297-11-14.402 0-3.791 3.068-5.191 5.281-5.191 1.312 0 4.151.501 5.719 4.457 1.59-3.968 4.464-4.447 5.726-4.447 2.54 0 5.274 1.621 5.274 5.181 0 4.069-5.136 8.625-11 14.402z" fill="#ff2d55"/>
-        </svg>
-        <div style="min-width:0;">
-          <div style="font-size:12px;font-weight:700;color:var(--text);white-space:nowrap;">Apple Health</div>
-          <div style="font-size:10px;color:var(--muted);" id="health-sync-status">Peso · FC · HRV · Sueño</div>
-        </div>
-      </div>
-      <button id="health-sync-btn" onclick="syncAppleHealth()" style="flex-shrink:0;padding:7px 14px;border-radius:10px;border:1.5px solid rgba(255,45,85,0.25);background:rgba(255,45,85,0.06);color:#ff2d55;font-size:12px;font-weight:700;font-family:'Barlow Condensed',sans-serif;letter-spacing:0.04em;cursor:pointer;transition:all 0.15s;white-space:nowrap;">
-        Sincronizar
-      </button>
-    </div>
 
     <div class="bio-form">
       <div class="row">
@@ -5483,11 +5467,6 @@ document.addEventListener('DOMContentLoaded', () => {
   migratePhotosToIDB();
   checkIOSInstallBanner();
 
-  // Show Apple Health banner only on iOS
-  if (/iPhone|iPad/.test(navigator.userAgent)) {
-    const banner = document.getElementById('health-sync-banner');
-    if (banner) banner.style.display = 'flex';
-  }
 
   // Seed biométricos de evaluación inicial si el array está vacío
   if (!getBio().length) {
@@ -5538,142 +5517,6 @@ document.addEventListener('DOMContentLoaded', () => {
   }, { passive: false });
 });
 
-// ══════════════════════════════════════════
-// APPLE HEALTH SYNC
-// ══════════════════════════════════════════
-
-async function syncAppleHealth() {
-  const btn      = document.getElementById('health-sync-btn');
-  const statusEl = document.getElementById('health-sync-status');
-
-  // Must be on iOS Safari with HealthKit Web API (iOS 17.4+, installed as PWA)
-  if (typeof Health === 'undefined') {
-    const isIOS = /iPhone|iPad/.test(navigator.userAgent);
-    const isStandaloneIOS = window.navigator.standalone;
-    if (isIOS && !isStandaloneIOS) {
-      showToast('Abre desde la app instalada (icono en pantalla inicio) para sincronizar con Salud');
-    } else if (isIOS) {
-      showToast('Requiere iOS 17.4 o superior');
-    }
-    // On non-iOS just silently mark unavailable
-    if (statusEl) statusEl.textContent = 'No disponible';
-    return;
-  }
-
-  if (btn) { btn.disabled = true; btn.textContent = '…'; }
-  if (statusEl) statusEl.textContent = 'Solicitando permisos…';
-
-  try {
-    const health = new Health();
-
-    // Request read authorization for the 4 metrics
-    await health.requestAuthorization([
-      'HKQuantityTypeIdentifierBodyMass',
-      'HKQuantityTypeIdentifierRestingHeartRate',
-      'HKQuantityTypeIdentifierHeartRateVariabilitySDNN',
-      'HKCategoryTypeIdentifierSleepAnalysis',
-    ], []);
-
-    if (statusEl) statusEl.textContent = 'Leyendo datos…';
-
-    const now       = new Date();
-    const ago48h    = new Date(now - 48 * 3600 * 1000);
-    const startOfYesterday = new Date(now);
-    startOfYesterday.setDate(now.getDate() - 1);
-    startOfYesterday.setHours(18, 0, 0, 0); // from 6pm yesterday to catch night sleep
-
-    let filled = [];
-
-    // ── Peso ──────────────────────────────────────
-    try {
-      const samples = await health.querySampleType(
-        'HKQuantityTypeIdentifierBodyMass',
-        ago48h, now,
-        { limit: 1, ascending: false }
-      );
-      if (samples && samples.length) {
-        // HK returns kg on metric systems; unit is 'kg'
-        const kg = samples[0].quantity;  // numeric value in kg
-        const el = document.getElementById('bio-peso');
-        if (el && kg > 0) { el.value = parseFloat(kg.toFixed(2)); filled.push('Peso'); }
-      }
-    } catch (_) {}
-
-    // ── FC Reposo ─────────────────────────────────
-    try {
-      const samples = await health.querySampleType(
-        'HKQuantityTypeIdentifierRestingHeartRate',
-        ago48h, now,
-        { limit: 1, ascending: false }
-      );
-      if (samples && samples.length) {
-        const bpm = Math.round(samples[0].quantity); // count/min
-        const el = document.getElementById('bio-fc');
-        if (el && bpm > 0) { el.value = bpm; filled.push('FC'); }
-      }
-    } catch (_) {}
-
-    // ── HRV SDNN ─────────────────────────────────
-    try {
-      const samples = await health.querySampleType(
-        'HKQuantityTypeIdentifierHeartRateVariabilitySDNN',
-        ago48h, now,
-        { limit: 1, ascending: false }
-      );
-      if (samples && samples.length) {
-        // HK stores HRV in seconds; multiply × 1000 → ms
-        const raw = samples[0].quantity;
-        const ms  = raw > 1 ? Math.round(raw) : Math.round(raw * 1000);
-        const el  = document.getElementById('bio-hrv');
-        if (el && ms > 0) { el.value = ms; filled.push('HRV'); }
-      }
-    } catch (_) {}
-
-    // ── Sueño ─────────────────────────────────────
-    try {
-      const sleepSamples = await health.querySampleType(
-        'HKCategoryTypeIdentifierSleepAnalysis',
-        startOfYesterday, now,
-        { ascending: true }
-      );
-      if (sleepSamples && sleepSamples.length) {
-        // Values: 0=inBed, 1=asleepUnspecified, 2=awake, 3=asleepCore, 4=asleepDeep, 5=asleepREM
-        // Sum duration of any "asleep" state (not inBed=0, not awake=2)
-        const asleepMs = sleepSamples
-          .filter(s => s.value !== 0 && s.value !== 2)
-          .reduce((total, s) => {
-            const start = new Date(s.startDate).getTime();
-            const end   = new Date(s.endDate).getTime();
-            return total + Math.max(0, end - start);
-          }, 0);
-        const hours = asleepMs / 3600000;
-        if (hours > 0.5) {
-          const el = document.getElementById('bio-sueno');
-          if (el) { el.value = parseFloat(hours.toFixed(1)); filled.push('Sueño'); }
-        }
-      }
-    } catch (_) {}
-
-    if (filled.length) {
-      if (statusEl) statusEl.textContent = '✓ ' + filled.join(' · ') + ' importados';
-      showToast('✓ Apple Health: ' + filled.join(', '));
-    } else {
-      if (statusEl) statusEl.textContent = 'Sin datos recientes en Health';
-      showToast('Sin datos nuevos en Apple Health');
-    }
-
-  } catch (err) {
-    const denied = err && (err.name === 'NotAllowedError' || err.code === 18);
-    if (statusEl) statusEl.textContent = denied ? 'Permiso denegado' : 'Error al conectar';
-    if (denied) {
-      showToast('Activa permisos: Ajustes → Privacidad → Salud → TransFísica');
-    } else {
-      showToast('Error Apple Health — ' + (err && err.message ? err.message : 'inténtalo de nuevo'));
-    }
-  } finally {
-    if (btn) { btn.disabled = false; btn.textContent = 'Sincronizar'; }
-  }
-}
 
 // ══════════════════════════════════════════
 // NOTIFICACIONES PWA
