@@ -2626,7 +2626,6 @@ function buildCardioHtml(c, semana) {
               ${pill('Trabajo', ejercicio.trabajo || '30s', ac)}
               ${pill('Descanso', ejercicio.descanso || '30s', 'var(--blue)')}
               ${pill('Total', durHoy, 'var(--text)')}
-              ${pill('Reps/ronda', ejercicio.reps || '—', 'var(--text)')}
               ${ejercicio.fc ? pill('FC', ejercicio.fc, 'var(--red)') : ''}
             </div>
             ${ejercicio.tip ? `<div style="font-size:11px;color:var(--text2);border-left:2.5px solid var(--accent);padding:6px 10px;border-radius:0 8px 8px 0;background:rgba(249,115,22,0.05);line-height:1.6;"><span style="font-weight:800;color:var(--accent);">Tip: </span>${ejercicio.tip}</div>` : ''}
