@@ -863,12 +863,19 @@ html.dark select.input { background: var(--surface); }
   </div>
 
   <div class="px" style="padding-top:4px;padding-bottom:0;">
-    <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0 12px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0 10px;">
       <div>
         <div style="font-size:20px;font-weight:800;" id="entreno-titulo">Push A</div>
         <div style="font-size:12px;color:var(--muted);" id="entreno-subtitulo">Lunes · Pecho, Hombro, Tríceps</div>
       </div>
-      <span id="entreno-badge" class="badge badge-orange">Hoy</span>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <button id="wakelock-btn" onclick="toggleWakeLock()" title="Pantalla siempre encendida"
+          style="display:flex;align-items:center;gap:5px;padding:7px 11px;border-radius:10px;border:1.5px solid var(--border);background:var(--surface);color:var(--muted);font-size:11px;font-weight:700;font-family:'Barlow Condensed',sans-serif;cursor:pointer;transition:all 0.15s;">
+          <svg id="wakelock-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          <span id="wakelock-label">Pantalla</span>
+        </button>
+        <span id="entreno-badge" class="badge badge-orange">Hoy</span>
+      </div>
     </div>
   </div>
 
@@ -1166,6 +1173,15 @@ html.dark select.input { background: var(--surface); }
   <div class="section-title">App &amp; Datos</div>
 
   <!-- Banner instalación iOS -->
+  <!-- Banner almacenamiento lleno (oculto por defecto) -->
+  <div id="storage-full-banner" class="card" style="margin:0 16px 8px;display:none;border-color:rgba(220,38,38,0.4);background:rgba(220,38,38,0.04);">
+    <div style="padding:14px 16px;">
+      <div style="font-size:14px;font-weight:700;font-family:'Barlow Condensed',sans-serif;color:var(--red);margin-bottom:6px;">⚠️ Almacenamiento lleno</div>
+      <div style="font-size:12px;color:var(--text2);margin-bottom:10px;">Exporta tus datos ahora para no perderlos. Después de exportar, puedes borrar datos antiguos.</div>
+      <button onclick="exportData()" class="btn btn-primary" style="width:100%;font-size:13px;">⬇️ Exportar datos ahora</button>
+    </div>
+  </div>
+
   <div id="ios-install-banner" class="card" style="margin:0 16px 0;display:none;">
     <div style="padding:14px 16px;">
       <div style="font-size:14px;font-weight:700;font-family:'Barlow Condensed',sans-serif;margin-bottom:6px;">📲 Instalar en pantalla de inicio</div>
@@ -1680,92 +1696,69 @@ html.dark select.input { background: var(--surface); }
       <button onclick="closeCheckin()" style="background:var(--bg3);border:1px solid var(--border);border-radius:50%;width:32px;height:32px;color:var(--muted);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;">×</button>
     </div>
 
-    <!-- BIOMÉTRICOS PRINCIPALES -->
-    <div style="font-size:10px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:0.1em;margin:18px 0 10px;">Composición corporal</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px;">
-      <div><label style="font-size:10px;color:var(--muted);">Peso (kg)</label><input type="number" class="input" id="ci-peso" step="0.05" placeholder="74.6" inputmode="decimal"></div>
-      <div><label style="font-size:10px;color:var(--muted);">% Grasa</label><input type="number" class="input" id="ci-grasa" step="0.1" placeholder="16.9" inputmode="decimal"></div>
-      <div><label style="font-size:10px;color:var(--muted);">Masa musc. (kg)</label><input type="number" class="input" id="ci-musculo" step="0.1" placeholder="62.5" inputmode="decimal"></div>
-    </div>
-
-    <!-- VITALES -->
-    <div style="font-size:10px;font-weight:700;color:var(--blue);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:10px;">Vitales</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px;">
-      <div><label style="font-size:10px;color:var(--muted);">HRV (ms)</label><input type="number" class="input" id="ci-hrv" placeholder="39" inputmode="numeric"></div>
-      <div><label style="font-size:10px;color:var(--muted);">FC reposo (bpm)</label><input type="number" class="input" id="ci-fc" placeholder="52" inputmode="numeric"></div>
-      <div><label style="font-size:10px;color:var(--muted);">Sueño prom (h)</label><input type="number" class="input" id="ci-sueno" step="0.5" placeholder="7.5" inputmode="decimal"></div>
-    </div>
-
-    <!-- MORFOLOGÍA -->
-    <div style="font-size:10px;font-weight:700;color:var(--purple);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:10px;">Morfología</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;">
-      <div><label style="font-size:10px;color:var(--muted);">Cintura (cm)</label><input type="number" class="input" id="ci-cintura" step="0.5" placeholder="84"></div>
-      <div><label style="font-size:10px;color:var(--muted);">Pasos/día prom.</label><input type="number" class="input" id="ci-pasos" placeholder="8000" inputmode="numeric"></div>
-    </div>
-
-    <!-- 6 EJERCICIOS CLAVE -->
-    <div style="font-size:10px;font-weight:700;color:var(--yellow);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:10px;">6 Ejercicios clave (kg máx × reps)</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;">
-      <div>
-        <label style="font-size:10px;color:var(--muted);">Press Banca</label>
-        <div style="display:flex;gap:4px;">
-          <input type="number" class="input" id="ci-banca-kg" placeholder="kg" style="flex:1;" inputmode="decimal">
-          <input type="number" class="input" id="ci-banca-r" placeholder="r" style="width:48px;" inputmode="numeric">
-        </div>
+    <!-- ESENCIALES -->
+    <div style="margin:18px 0 14px;">
+      <!-- Peso -->
+      <div style="margin-bottom:14px;">
+        <label style="font-size:12px;font-weight:700;color:var(--text);">Peso (kg)</label>
+        <input type="number" class="input" id="ci-peso" step="0.05" placeholder="74.6" inputmode="decimal" style="margin-top:6px;font-size:16px;font-weight:700;">
       </div>
-      <div>
-        <label style="font-size:10px;color:var(--muted);">Press Militar</label>
-        <div style="display:flex;gap:4px;">
-          <input type="number" class="input" id="ci-militar-kg" placeholder="kg" style="flex:1;" inputmode="decimal">
-          <input type="number" class="input" id="ci-militar-r" placeholder="r" style="width:48px;" inputmode="numeric">
-        </div>
+      <!-- Sueño stars -->
+      <div style="margin-bottom:14px;">
+        <label style="font-size:12px;font-weight:700;color:var(--text);">Calidad de sueño</label>
+        <div id="ci-sueno-stars" style="display:flex;gap:6px;margin-top:8px;" role="group" aria-label="Calidad sueño"></div>
+        <input type="hidden" id="ci-suenoq" value="">
       </div>
-      <div>
-        <label style="font-size:10px;color:var(--muted);">Dominadas (lastre)</label>
-        <div style="display:flex;gap:4px;">
-          <input type="number" class="input" id="ci-domin-kg" placeholder="kg" style="flex:1;" inputmode="decimal">
-          <input type="number" class="input" id="ci-domin-r" placeholder="r" style="width:48px;" inputmode="numeric">
-        </div>
-      </div>
-      <div>
-        <label style="font-size:10px;color:var(--muted);">Remo con Barra</label>
-        <div style="display:flex;gap:4px;">
-          <input type="number" class="input" id="ci-remo-kg" placeholder="kg" style="flex:1;" inputmode="decimal">
-          <input type="number" class="input" id="ci-remo-r" placeholder="r" style="width:48px;" inputmode="numeric">
-        </div>
-      </div>
-      <div>
-        <label style="font-size:10px;color:var(--muted);">Sentadilla</label>
-        <div style="display:flex;gap:4px;">
-          <input type="number" class="input" id="ci-squat-kg" placeholder="kg" style="flex:1;" inputmode="decimal">
-          <input type="number" class="input" id="ci-squat-r" placeholder="r" style="width:48px;" inputmode="numeric">
-        </div>
-      </div>
-      <div>
-        <label style="font-size:10px;color:var(--muted);">Peso Muerto</label>
-        <div style="display:flex;gap:4px;">
-          <input type="number" class="input" id="ci-deadlift-kg" placeholder="kg" style="flex:1;" inputmode="decimal">
-          <input type="number" class="input" id="ci-deadlift-r" placeholder="r" style="width:48px;" inputmode="numeric">
-        </div>
+      <!-- Energía stars -->
+      <div style="margin-bottom:4px;">
+        <label style="font-size:12px;font-weight:700;color:var(--text);">Energía / cómo te sientes</label>
+        <div id="ci-energia-stars" style="display:flex;gap:6px;margin-top:8px;" role="group" aria-label="Energía"></div>
+        <input type="hidden" id="ci-energia" value="">
       </div>
     </div>
 
-    <!-- NUTRICIÓN MEDIA SEMANAL -->
-    <div style="font-size:10px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:10px;">Nutrición media semanal</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;">
-      <div><label style="font-size:10px;color:var(--muted);">kcal/día prom.</label><input type="number" class="input" id="ci-nut-kcal" placeholder="2450" inputmode="numeric"></div>
-      <div><label style="font-size:10px;color:var(--muted);">Proteína g/día</label><input type="number" class="input" id="ci-nut-prot" placeholder="170" inputmode="numeric"></div>
-    </div>
-
-    <!-- ESTADO SUBJETIVO -->
-    <div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:10px;">Estado subjetivo (1–10)</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:20px;">
-      <div><label style="font-size:10px;color:var(--muted);">Energía</label><input type="number" class="input" id="ci-energia" min="1" max="10" placeholder="7"></div>
-      <div><label style="font-size:10px;color:var(--muted);">Calidad sueño</label><input type="number" class="input" id="ci-suenoq" min="1" max="10" placeholder="7"></div>
-      <div><label style="font-size:10px;color:var(--muted);">Motivación</label><input type="number" class="input" id="ci-motivacion" min="1" max="10" placeholder="7"></div>
-      <div><label style="font-size:10px;color:var(--muted);">Estrés laboral</label><input type="number" class="input" id="ci-estres" min="1" max="10" placeholder="5"></div>
-      <div><label style="font-size:10px;color:var(--muted);">Recuperación</label><input type="number" class="input" id="ci-recuperacion" min="1" max="10" placeholder="7"></div>
-    </div>
+    <!-- OPCIONAL (desplegable) -->
+    <details style="margin-bottom:20px;">
+      <summary style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;cursor:pointer;padding:10px 0;list-style:none;display:flex;align-items:center;gap:6px;">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        Más datos (opcional)
+      </summary>
+      <div style="padding-top:12px;">
+        <div style="font-size:10px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:8px;">Composición corporal</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;">
+          <div><label style="font-size:10px;color:var(--muted);">% Grasa</label><input type="number" class="input" id="ci-grasa" step="0.1" placeholder="16.9" inputmode="decimal"></div>
+          <div><label style="font-size:10px;color:var(--muted);">Masa musc. (kg)</label><input type="number" class="input" id="ci-musculo" step="0.1" placeholder="62.5" inputmode="decimal"></div>
+          <div><label style="font-size:10px;color:var(--muted);">Cintura (cm)</label><input type="number" class="input" id="ci-cintura" step="0.5" placeholder="84"></div>
+          <div><label style="font-size:10px;color:var(--muted);">Pasos/día prom.</label><input type="number" class="input" id="ci-pasos" placeholder="8000" inputmode="numeric"></div>
+        </div>
+        <div style="font-size:10px;font-weight:700;color:var(--blue);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:8px;">Vitales</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px;">
+          <div><label style="font-size:10px;color:var(--muted);">HRV (ms)</label><input type="number" class="input" id="ci-hrv" placeholder="39" inputmode="numeric"></div>
+          <div><label style="font-size:10px;color:var(--muted);">FC reposo (bpm)</label><input type="number" class="input" id="ci-fc" placeholder="52" inputmode="numeric"></div>
+          <div><label style="font-size:10px;color:var(--muted);">Sueño (h)</label><input type="number" class="input" id="ci-sueno" step="0.5" placeholder="7.5" inputmode="decimal"></div>
+        </div>
+        <div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:8px;">Estado subjetivo (1–10)</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px;">
+          <div><label style="font-size:10px;color:var(--muted);">Motivación</label><input type="number" class="input" id="ci-motivacion" min="1" max="10" placeholder="7"></div>
+          <div><label style="font-size:10px;color:var(--muted);">Estrés laboral</label><input type="number" class="input" id="ci-estres" min="1" max="10" placeholder="5"></div>
+          <div><label style="font-size:10px;color:var(--muted);">Recuperación</label><input type="number" class="input" id="ci-recuperacion" min="1" max="10" placeholder="7"></div>
+        </div>
+        <div style="font-size:10px;font-weight:700;color:var(--green);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:8px;">Nutrición media semanal</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;">
+          <div><label style="font-size:10px;color:var(--muted);">kcal/día prom.</label><input type="number" class="input" id="ci-nut-kcal" placeholder="2450" inputmode="numeric"></div>
+          <div><label style="font-size:10px;color:var(--muted);">Proteína g/día</label><input type="number" class="input" id="ci-nut-prot" placeholder="170" inputmode="numeric"></div>
+        </div>
+        <div style="font-size:10px;font-weight:700;color:var(--yellow);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:8px;">6 Ejercicios clave (kg × reps)</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:4px;">
+          <div><label style="font-size:10px;color:var(--muted);">Press Banca</label><div style="display:flex;gap:4px;"><input type="number" class="input" id="ci-banca-kg" placeholder="kg" style="flex:1;" inputmode="decimal"><input type="number" class="input" id="ci-banca-r" placeholder="r" style="width:48px;" inputmode="numeric"></div></div>
+          <div><label style="font-size:10px;color:var(--muted);">Press Militar</label><div style="display:flex;gap:4px;"><input type="number" class="input" id="ci-militar-kg" placeholder="kg" style="flex:1;" inputmode="decimal"><input type="number" class="input" id="ci-militar-r" placeholder="r" style="width:48px;" inputmode="numeric"></div></div>
+          <div><label style="font-size:10px;color:var(--muted);">Dominadas</label><div style="display:flex;gap:4px;"><input type="number" class="input" id="ci-domin-kg" placeholder="kg" style="flex:1;" inputmode="decimal"><input type="number" class="input" id="ci-domin-r" placeholder="r" style="width:48px;" inputmode="numeric"></div></div>
+          <div><label style="font-size:10px;color:var(--muted);">Remo con Barra</label><div style="display:flex;gap:4px;"><input type="number" class="input" id="ci-remo-kg" placeholder="kg" style="flex:1;" inputmode="decimal"><input type="number" class="input" id="ci-remo-r" placeholder="r" style="width:48px;" inputmode="numeric"></div></div>
+          <div><label style="font-size:10px;color:var(--muted);">Sentadilla</label><div style="display:flex;gap:4px;"><input type="number" class="input" id="ci-squat-kg" placeholder="kg" style="flex:1;" inputmode="decimal"><input type="number" class="input" id="ci-squat-r" placeholder="r" style="width:48px;" inputmode="numeric"></div></div>
+          <div><label style="font-size:10px;color:var(--muted);">Peso Muerto</label><div style="display:flex;gap:4px;"><input type="number" class="input" id="ci-deadlift-kg" placeholder="kg" style="flex:1;" inputmode="decimal"><input type="number" class="input" id="ci-deadlift-r" placeholder="r" style="width:48px;" inputmode="numeric"></div></div>
+        </div>
+      </div>
+    </details>
 
     <button class="btn btn-primary btn-block" style="font-size:15px;padding:14px;" onclick="guardarCheckin()">💾 Guardar check-in semanal</button>
   </div>
@@ -2101,7 +2094,16 @@ function ls(key, def) {
   try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : def; } catch { return def; }
 }
 function lsSet(key, val) {
-  try { localStorage.setItem(key, JSON.stringify(val)); } catch {}
+  try {
+    localStorage.setItem(key, JSON.stringify(val));
+  } catch (e) {
+    if (e && (e.name === 'QuotaExceededError' || e.code === 22)) {
+      showToast('⚠️ Almacenamiento lleno — exporta tus datos ahora');
+      // Show backup banner urgently
+      const backupEl = document.getElementById('storage-full-banner');
+      if (backupEl) backupEl.style.display = '';
+    }
+  }
 }
 
 function todayKey() {
@@ -2499,7 +2501,17 @@ function getWeeklyProgressReport() {
 let currentEntrenoDay = DAY_SCHEDULE[new Date().getDay()];
 let restInterval = null;
 let restTotal = 0;
-let currentSessionSets = {}; // { exId: [{kg, reps, rir}] }
+// Restore in-progress draft from localStorage if it exists for today
+let currentSessionSets = (function() {
+  try {
+    const raw = localStorage.getItem('session_draft_v1');
+    if (!raw) return {};
+    const d = JSON.parse(raw);
+    const age = Date.now() - (d.ts || 0);
+    if (d.day === DAY_SCHEDULE[new Date().getDay()] && age < 6 * 3600 * 1000) return d.sets || {};
+  } catch(e) {}
+  return {};
+})();
 let sessionRatings = { energia: 0, recuperacion: 0, motivacion: 0 };
 
 function setRating(type, val) {
@@ -2538,89 +2550,127 @@ function renderDayTabs() {
 
 function selectEntrenoDay(key) {
   currentEntrenoDay = key;
+  // Restore draft for this day if it exists
+  const draft = loadDraft(key);
+  currentSessionSets = draft || {};
+  if (draft) showToast('Borrador restaurado — continúa donde lo dejaste');
   renderDayTabs();
   renderEntreno(key);
 }
 
-function buildCardioHtml(c) {
+function buildCardioHtml(c, semana) {
+  const sem = semana || 1;
   const isHIIT = c.tipo && c.tipo.includes('HIIT');
-  const accentColor = isHIIT ? 'var(--red)' : 'var(--green)';
-  const accentBg = isHIIT ? 'rgba(220,38,38,0.05)' : 'rgba(22,163,74,0.05)';
-  const accentBorder = isHIIT ? 'rgba(220,38,38,0.2)' : 'rgba(22,163,74,0.2)';
+  const ac = isHIIT ? 'var(--red)' : 'var(--green)';
+  const acBg = isHIIT ? 'rgba(220,38,38,0.05)' : 'rgba(22,163,74,0.05)';
+  const acBorder = isHIIT ? 'rgba(220,38,38,0.2)' : 'rgba(22,163,74,0.2)';
 
-  const pill = (label, value, color) =>
-    `<div style="display:flex;flex-direction:column;align-items:center;padding:7px 10px;background:var(--surface2);border-radius:9px;min-width:58px;border:1px solid var(--border);">
-      <div style="font-size:15px;font-weight:900;font-family:'Barlow Condensed',sans-serif;color:${color || 'var(--text)'};line-height:1;">${value}</div>
-      <div style="font-size:9px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:0.06em;margin-top:2px;">${label}</div>
-    </div>`;
-
-  let ejerciciosHtml = '';
+  // ── Resolve what to do THIS week ──────────────────────────
+  let ejercicio = null;
   if (c.ejercicios && c.ejercicios.length) {
-    ejerciciosHtml = `
-      <div style="margin-top:12px;">
-        <div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:0.1em;color:${accentColor};margin-bottom:8px;">Ejercicios — qué hacer exactamente</div>
-        ${c.ejercicios.map(ej => {
-          const isHIIT2 = !!ej.trabajo && ej.trabajo !== '—' && !ej.trabajo.includes('continuo');
-          const seriesStr = typeof ej.series === 'object'
-            ? Object.entries(ej.series).map(([k,v]) => `${k}:${v}r`).join(' · ')
-            : (ej.series || '—');
-          const durStr = ej.duracionTotal
-            ? Object.values(ej.duracionTotal)[0]
-            : ej.trabajo;
-          return `
-          <div style="margin-bottom:10px;padding:12px 13px;background:var(--surface);border-radius:12px;border:1px solid var(--border);">
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
-              <div style="font-size:14px;font-weight:900;font-family:'Barlow Condensed',sans-serif;color:var(--text);">${ej.nombre}</div>
-              <span style="font-size:9px;font-weight:700;background:${accentBg};border:1px solid ${accentBorder};color:${accentColor};padding:2px 8px;border-radius:20px;white-space:nowrap;">${ej.semanas}</span>
-            </div>
-            <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;">
-              ${isHIIT2
-                ? pill('Rondas', seriesStr, accentColor)
-                  + pill('Trabajo', ej.trabajo, accentColor)
-                  + pill('Descanso', ej.descanso, 'var(--blue)')
-                  + pill('Duración', durStr, 'var(--text)')
-                  + pill('Reps/ronda', ej.reps || '—', 'var(--text)')
-                : pill('Duración', durStr, accentColor)
-                  + pill('Tipo', ej.trabajo || '—', 'var(--text)')
-              }
-              ${ej.fc ? pill('FC obj.', ej.fc, 'var(--red)') : ''}
-            </div>
-            ${ej.tip ? `<div style="font-size:11px;color:var(--text2);background:rgba(249,115,22,0.05);border-left:2.5px solid var(--accent);padding:6px 9px;border-radius:0 7px 7px 0;line-height:1.5;"><span style="font-weight:700;color:var(--accent);">Tip: </span>${ej.tip}</div>` : ''}
-          </div>`;
-        }).join('')}
-      </div>`;
+    if (isHIIT) {
+      // HIIT: rotate by week within the phase (sem 1-2 / 3-4 / 5-6 etc.)
+      const wInPhase = sem <= 8 ? sem : sem <= 12 ? sem - 8 : sem - 12;
+      if (wInPhase <= 2) ejercicio = c.ejercicios[0];
+      else if (wInPhase <= 4) ejercicio = c.ejercicios[1];
+      else ejercicio = c.ejercicios[2] || c.ejercicios[1];
+    } else {
+      // LISS: pick by phase
+      if (sem <= 8)       ejercicio = c.ejercicios[0];
+      else if (sem <= 12) ejercicio = c.ejercicios[1] || c.ejercicios[0];
+      else                ejercicio = c.ejercicios[2] || c.ejercicios[1] || c.ejercicios[0];
+    }
   }
 
+  // ── Resolve rondas/duración for this phase ─────────────────
+  let rondasHoy = '—', durHoy = '—', kcalHoy = '—';
+  if (isHIIT && ejercicio) {
+    if (sem <= 8)       { rondasHoy = '8 rondas'; durHoy = '8 min'; kcalHoy = '~80–100 kcal'; }
+    else if (sem <= 12) { rondasHoy = '6 rondas'; durHoy = '6 min'; kcalHoy = '~60–80 kcal'; }
+    else                { rondasHoy = '10–12 rondas'; durHoy = '10–12 min'; kcalHoy = '~100–140 kcal'; }
+  } else if (ejercicio) {
+    const durObj = ejercicio.duracionTotal || {};
+    if (sem <= 8)       { durHoy = durObj.F1 || '20 min'; kcalHoy = '~120–150 kcal'; }
+    else if (sem <= 12) { durHoy = durObj.F2 || '30 min'; kcalHoy = '~180–225 kcal'; }
+    else                { durHoy = durObj.F3 || '30–45 min'; kcalHoy = '~225–340 kcal'; }
+  }
+
+  const pill = (label, val, color) =>
+    `<div style="flex:1;min-width:54px;display:flex;flex-direction:column;align-items:center;padding:8px 6px;background:var(--surface);border-radius:10px;border:1px solid var(--border);">
+      <div style="font-size:17px;font-weight:900;font-family:'Barlow Condensed',sans-serif;color:${color};line-height:1;text-align:center;">${val}</div>
+      <div style="font-size:9px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:0.05em;margin-top:3px;text-align:center;">${label}</div>
+    </div>`;
+
+  let detalleHtml = '';
+  if (ejercicio) {
+    if (isHIIT) {
+      detalleHtml = `
+        <div style="margin:10px 0 0;">
+          <div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:0.1em;color:${ac};margin-bottom:8px;">Cómo hacerlo — Semana ${sem}</div>
+          <div style="padding:12px 13px;background:var(--surface2);border-radius:12px;border:1.5px solid ${acBorder};">
+            <div style="font-size:18px;font-weight:900;font-family:'Barlow Condensed',sans-serif;color:var(--text);margin-bottom:10px;">${ejercicio.nombre}</div>
+            <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;">
+              ${pill('Rondas', rondasHoy, ac)}
+              ${pill('Trabajo', ejercicio.trabajo || '30s', ac)}
+              ${pill('Descanso', ejercicio.descanso || '30s', 'var(--blue)')}
+              ${pill('Total', durHoy, 'var(--text)')}
+              ${pill('Reps/ronda', ejercicio.reps || '—', 'var(--text)')}
+              ${ejercicio.fc ? pill('FC', ejercicio.fc, 'var(--red)') : ''}
+            </div>
+            ${ejercicio.tip ? `<div style="font-size:11px;color:var(--text2);border-left:2.5px solid var(--accent);padding:6px 10px;border-radius:0 8px 8px 0;background:rgba(249,115,22,0.05);line-height:1.6;"><span style="font-weight:800;color:var(--accent);">Tip: </span>${ejercicio.tip}</div>` : ''}
+          </div>
+        </div>`;
+    } else {
+      detalleHtml = `
+        <div style="margin:10px 0 0;">
+          <div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:0.1em;color:${ac};margin-bottom:8px;">Cómo hacerlo — Semana ${sem}</div>
+          <div style="padding:12px 13px;background:var(--surface2);border-radius:12px;border:1.5px solid ${acBorder};">
+            <div style="font-size:18px;font-weight:900;font-family:'Barlow Condensed',sans-serif;color:var(--text);margin-bottom:10px;">${ejercicio.nombre}</div>
+            <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;">
+              ${pill('Duración', durHoy, ac)}
+              ${pill('Tipo', 'Continuo', 'var(--text)')}
+              ${ejercicio.fc ? pill('FC obj.', ejercicio.fc, 'var(--red)') : ''}
+              ${pill('Kcal ~', kcalHoy.replace('~',''), 'var(--green)')}
+            </div>
+            ${ejercicio.tip ? `<div style="font-size:11px;color:var(--text2);border-left:2.5px solid var(--green);padding:6px 10px;border-radius:0 8px 8px 0;background:rgba(22,163,74,0.05);line-height:1.6;"><span style="font-weight:800;color:var(--green);">Cómo: </span>${ejercicio.tip}</div>` : ''}
+          </div>
+        </div>`;
+    }
+  }
+
+  const porQueHtml = c.porQue ? `
+    <details style="margin-top:10px;">
+      <summary style="font-size:11px;font-weight:700;color:var(--muted);cursor:pointer;list-style:none;display:flex;align-items:center;gap:5px;">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4M12 8h.01"/></svg>
+        ¿Por qué este cardio?
+      </summary>
+      <div style="margin-top:8px;font-size:11px;color:var(--text2);line-height:1.7;padding:9px 11px;background:var(--surface);border-radius:9px;border:1px solid var(--border);">${c.porQue}</div>
+    </details>` : '';
+
   const reglaHtml = c.regla ? `
-    <div style="margin-top:10px;padding:9px 11px;background:rgba(249,115,22,0.06);border-left:3px solid var(--accent);border-radius:0 8px 8px 0;font-size:11px;color:var(--text2);line-height:1.5;">
-      <span style="font-weight:800;color:var(--accent);">Regla clave: </span>${c.regla}
+    <div style="margin-top:10px;padding:8px 10px;background:rgba(249,115,22,0.05);border-left:3px solid var(--accent);border-radius:0 8px 8px 0;font-size:11px;color:var(--text2);line-height:1.5;">
+      <span style="font-weight:800;color:var(--accent);">⚠ </span>${c.regla}
     </div>` : '';
 
   return `
-    <div style="margin:10px 16px 0;background:${accentBg};border:1.5px solid ${accentBorder};border-radius:16px;overflow:hidden;">
-      <div style="padding:14px 16px 0;">
-        <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px;">
-          <div>
-            <div style="font-size:9px;font-weight:800;font-family:'Barlow Condensed',sans-serif;color:${accentColor};text-transform:uppercase;letter-spacing:0.1em;margin-bottom:3px;">Cardio post-peso</div>
-            <div style="font-size:19px;font-weight:900;font-family:'Barlow Condensed',sans-serif;color:var(--text);">${c.tipo}</div>
-          </div>
-          <div style="text-align:right;flex-shrink:0;">
-            <div style="font-size:22px;font-weight:900;font-family:'Barlow Condensed',sans-serif;color:${accentColor};line-height:1;">${c.duracion}</div>
-            ${c.kcalEstimado ? `<div style="font-size:9px;color:var(--muted);margin-top:2px;">~${c.kcalEstimado}</div>` : ''}
-          </div>
+    <div style="margin:10px 16px 0;background:${acBg};border:1.5px solid ${acBorder};border-radius:16px;padding:14px 15px 14px;">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:4px;">
+        <div>
+          <div style="font-size:9px;font-weight:800;font-family:'Barlow Condensed',sans-serif;color:${ac};text-transform:uppercase;letter-spacing:0.1em;">Cardio post-peso</div>
+          <div style="font-size:20px;font-weight:900;font-family:'Barlow Condensed',sans-serif;color:var(--text);line-height:1.1;">${c.tipo}</div>
         </div>
-        ${c.porQue ? `
-          <div style="margin-bottom:10px;padding:9px 11px;background:var(--surface);border-radius:10px;border:1px solid var(--border);">
-            <div style="font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted);margin-bottom:4px;">Por qué este cardio</div>
-            <div style="font-size:11px;color:var(--text2);line-height:1.6;">${c.porQue}</div>
-          </div>` : (c.descripcion ? `<div style="font-size:11px;color:var(--text2);line-height:1.6;margin-bottom:10px;">${c.descripcion}</div>` : '')}
-        ${ejerciciosHtml}
-        ${reglaHtml}
+        <div style="text-align:right;flex-shrink:0;">
+          <div style="font-size:24px;font-weight:900;font-family:'Barlow Condensed',sans-serif;color:${ac};line-height:1;">${durHoy}</div>
+          <div style="font-size:10px;color:var(--muted);margin-top:1px;">${kcalHoy}</div>
+        </div>
       </div>
+      ${detalleHtml}
+      ${reglaHtml}
+      ${porQueHtml}
       ${isHIIT ? `
-        <div style="margin-top:12px;padding:12px 16px;background:var(--surface);border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;">
-          <div style="font-size:12px;font-weight:700;color:var(--text);">Timer HIIT 30/30</div>
-          <button onclick="startHIITTimer()" style="padding:7px 16px;border-radius:10px;border:1.5px solid ${accentColor};background:transparent;color:${accentColor};font-size:12px;font-weight:800;font-family:'Barlow Condensed',sans-serif;cursor:pointer;letter-spacing:0.05em;">▶ INICIAR</button>
+        <div style="margin-top:12px;display:flex;align-items:center;justify-content:space-between;padding-top:12px;border-top:1px solid ${acBorder};">
+          <div style="font-size:12px;font-weight:700;color:var(--text);">Timer 30/30</div>
+          <button onclick="startHIITTimer()" style="padding:8px 18px;border-radius:10px;border:none;background:var(--red);color:#fff;font-size:13px;font-weight:800;font-family:'Barlow Condensed',sans-serif;cursor:pointer;letter-spacing:0.05em;">▶ INICIAR TIMER</button>
         </div>` : ''}
     </div>`;
 }
@@ -2665,10 +2715,25 @@ function renderEntreno(dayKey) {
     const restLabel = ex.rest > 0 ? ex.rest + 's descanso' : '→ directo al siguiente';
     const suggested = getSuggestedWeight(ex);
     const isDeload = isDeloadWeek(getCurrentPlanState().semana);
+    // Compute delta vs last session
+    let deltaHtml = '';
+    if (suggested) {
+      const prevSessions = getSessions().slice().reverse();
+      const prevS = prevSessions.find(s => s.exercises && s.exercises[ex.name]);
+      if (prevS) {
+        const prevKg = Math.max(...(prevS.exercises[ex.name] || []).map(s => +s.kg || 0));
+        if (prevKg > 0) {
+          const delta = Math.round((suggested - prevKg) * 4) / 4;
+          if (delta > 0) deltaHtml = `<span style="color:var(--green);font-weight:800"> ↑ +${delta}kg</span>`;
+          else if (delta < 0) deltaHtml = `<span style="color:var(--red);font-weight:800"> ↓ ${delta}kg</span>`;
+          else deltaHtml = `<span style="color:var(--muted);font-weight:700"> = igual</span>`;
+        }
+      }
+    }
     const suggestHtml = suggested ? `
-      <div style="display:flex;align-items:center;gap:6px;padding:7px 10px;background:rgba(37,99,235,0.06);border:1px solid rgba(37,99,235,0.18);border-radius:8px;margin-bottom:10px;">
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2.5"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
-        <span style="font-size:11px;font-weight:700;color:var(--blue);">Sugerido: ${suggested} kg${isDeload ? ' · <span style=color:var(--accent)>DELOAD −40%</span>' : ''}</span>
+      <div style="display:flex;align-items:center;gap:6px;padding:8px 12px;background:rgba(37,99,235,0.06);border:1px solid rgba(37,99,235,0.18);border-radius:8px;margin-bottom:10px;">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" stroke-width="2.5"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
+        <span style="font-size:12px;font-weight:800;color:var(--blue);">Usa ${suggested} kg hoy${deltaHtml}${isDeload ? ' · <span style="color:var(--accent)">DELOAD</span>' : ''}</span>
       </div>` : (isDeload ? `
       <div style="padding:6px 10px;background:rgba(249,115,22,0.07);border:1px solid rgba(249,115,22,0.2);border-radius:8px;margin-bottom:10px;font-size:11px;font-weight:700;color:var(--accent);">🔄 Semana Deload — 60% carga, 50% series</div>` : '');
     return `
@@ -2751,7 +2816,7 @@ function renderEntreno(dayKey) {
     </div>` : '';
 
   const cardioSource = (advSess && advSess.cardio) ? advSess.cardio : (prog.cardio || null);
-  const cardioHtml = cardioSource ? buildCardioHtml(cardioSource) : '';
+  const cardioHtml = cardioSource ? buildCardioHtml(cardioSource, planState.semana) : '';
 
   // Si es sesión de cardio puro, renderizar con la UI de cardio
   if (prog.type === 'cardio') {
@@ -2882,6 +2947,7 @@ function startHIITTimer(rounds) {
   const label   = document.getElementById('rest-label');
   if (overlay) overlay.classList.add('show');
   if (label)   label.textContent = `RONDA 1 / ${hiitTotalRounds} · TRABAJO`;
+  speakText('Ronda 1. ¡Trabaja!');
   runHIITTick(30);
 }
 
@@ -2900,25 +2966,35 @@ function runHIITTick(seconds) {
     if (ring)    ring.style.strokeDashoffset = circumference * (1 - remaining / seconds);
     if (ring)    ring.style.stroke = hiitPhase === 'work' ? '#dc2626' : '#f97316';
 
+    // Countdown beeps at 3,2,1
+    if (remaining <= 3 && remaining > 0) playCountdownBeep(remaining);
+
     if (remaining <= 0) {
       clearInterval(hiitInterval);
       if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
 
       if (hiitPhase === 'work') {
         hiitPhase = 'rest';
+        playDoneSound();
         if (label) label.textContent = `RONDA ${hiitRound} / ${hiitTotalRounds} · DESCANSO`;
+        speakText('Descansa');
         runHIITTick(30);
       } else {
         hiitRound++;
         if (hiitRound > hiitTotalRounds) {
           clearInterval(hiitInterval);
+          playDoneSound();
+          setTimeout(() => playDoneSound(), 400);
           if (display) display.textContent = '0';
-          if (label)   label.textContent = 'HIIT COMPLETADO';
+          if (label)   label.textContent = 'HIIT COMPLETADO ✓';
+          speakText('¡Enhorabuena! HIIT completado.');
           if (navigator.vibrate) navigator.vibrate([300, 150, 300, 150, 300]);
-          setTimeout(() => { document.getElementById('rest-overlay').classList.remove('show'); }, 2000);
+          setTimeout(() => { document.getElementById('rest-overlay').classList.remove('show'); }, 3000);
         } else {
           hiitPhase = 'work';
+          playDoneSound();
           if (label) label.textContent = `RONDA ${hiitRound} / ${hiitTotalRounds} · TRABAJO`;
+          speakText(`Ronda ${hiitRound}. ¡Trabaja!`);
           runHIITTick(30);
         }
       }
@@ -2992,11 +3068,40 @@ function updateRecBox(exId) {
   box.innerHTML = `<span style="font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:0.08em;">${rec.accion}</span><br>${rec.texto}`;
 }
 
+const SESSION_DRAFT_KEY = 'session_draft_v1';
+
+function saveDraft() {
+  try {
+    localStorage.setItem(SESSION_DRAFT_KEY, JSON.stringify({
+      day: currentEntrenoDay,
+      sets: currentSessionSets,
+      ts: Date.now()
+    }));
+  } catch(e) {}
+}
+
+function loadDraft(dayKey) {
+  try {
+    const raw = localStorage.getItem(SESSION_DRAFT_KEY);
+    if (!raw) return null;
+    const draft = JSON.parse(raw);
+    // Only restore if same day and less than 6 hours old
+    const age = Date.now() - (draft.ts || 0);
+    if (draft.day === dayKey && age < 6 * 3600 * 1000) return draft.sets;
+  } catch(e) {}
+  return null;
+}
+
+function clearDraft() {
+  localStorage.removeItem(SESSION_DRAFT_KEY);
+}
+
 function updateSet(exId, si, field, val) {
   if (!currentSessionSets[exId]) currentSessionSets[exId] = buildDefaultSets(findEx(exId));
   if (!currentSessionSets[exId][si]) currentSessionSets[exId][si] = {};
   currentSessionSets[exId][si][field] = val;
   if (field === 'rir') updateRecBox(exId);
+  saveDraft(); // persist mid-session
 }
 
 function findEx(exId) {
@@ -3077,43 +3182,142 @@ function toggleHist(exId) {
 }
 
 // ═══════════════════════════════════════════════════
-// AUDIO ENGINE
+// WAKELOCK
+// ═══════════════════════════════════════════════════
+let _wakeLock = null;
+let _wakeLockActive = false;
+
+async function toggleWakeLock() {
+  if (_wakeLockActive) {
+    if (_wakeLock) { try { await _wakeLock.release(); } catch(e){} _wakeLock = null; }
+    _wakeLockActive = false;
+  } else {
+    if (!('wakeLock' in navigator)) {
+      showToast('Tu navegador no soporta WakeLock. Desactiva el apagado automático en ajustes.');
+      return;
+    }
+    try {
+      _wakeLock = await navigator.wakeLock.request('screen');
+      _wakeLockActive = true;
+      _wakeLock.addEventListener('release', () => {
+        _wakeLockActive = false;
+        _wakeLock = null;
+        _updateWakeLockBtn();
+      });
+    } catch(e) {
+      showToast('No se pudo activar la pantalla siempre encendida.');
+      return;
+    }
+  }
+  _updateWakeLockBtn();
+}
+
+function _updateWakeLockBtn() {
+  const btn = document.getElementById('wakelock-btn');
+  const icon = document.getElementById('wakelock-icon');
+  const label = document.getElementById('wakelock-label');
+  if (!btn) return;
+  if (_wakeLockActive) {
+    btn.style.background = 'var(--accent)';
+    btn.style.color = '#fff';
+    btn.style.borderColor = 'var(--accent)';
+    icon.innerHTML = '<rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/><line x1="12" y1="15" x2="12" y2="17"/>';
+    label.textContent = 'Activa';
+  } else {
+    btn.style.background = 'var(--surface)';
+    btn.style.color = 'var(--muted)';
+    btn.style.borderColor = 'var(--border)';
+    icon.innerHTML = '<rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>';
+    label.textContent = 'Pantalla';
+  }
+}
+
+// Re-acquire wakeLock when tab becomes visible again
+document.addEventListener('visibilitychange', async () => {
+  if (document.visibilityState === 'visible' && _wakeLockActive && !_wakeLock) {
+    try {
+      _wakeLock = await navigator.wakeLock.request('screen');
+      _wakeLock.addEventListener('release', () => {
+        _wakeLockActive = false; _wakeLock = null; _updateWakeLockBtn();
+      });
+    } catch(e) {}
+  }
+});
+
+// AUDIO ENGINE — iOS-safe (unlock on first tap)
 // ═══════════════════════════════════════════════════
 let _audioCtx = null;
+let _audioUnlocked = false;
+
 function getAudioCtx() {
   if (!_audioCtx) _audioCtx = new (window.AudioContext || window.webkitAudioContext)();
   return _audioCtx;
 }
+
+// Unlock AudioContext on first user interaction (required by iOS Safari)
+function _unlockAudio() {
+  if (_audioUnlocked) return;
+  try {
+    const ctx = getAudioCtx();
+    // Play a silent buffer to unlock
+    const buf = ctx.createBuffer(1, 1, 22050);
+    const src = ctx.createBufferSource();
+    src.buffer = buf;
+    src.connect(ctx.destination);
+    src.start(0);
+    if (ctx.state === 'suspended') ctx.resume();
+    _audioUnlocked = true;
+  } catch(e) {}
+  // Also pre-load speech synthesis voice list (iOS lazy-loads them)
+  if ('speechSynthesis' in window) {
+    window.speechSynthesis.getVoices();
+  }
+}
+// Attach unlock to every tap/click on the document
+document.addEventListener('touchstart', _unlockAudio, { once: false, passive: true });
+document.addEventListener('click',      _unlockAudio, { once: false, passive: true });
+
 function playBeep(freq, duration, vol) {
   try {
     const ctx = getAudioCtx();
-    if (ctx.state === 'suspended') ctx.resume();
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-    osc.connect(gain); gain.connect(ctx.destination);
-    osc.frequency.value = freq || 880;
-    osc.type = 'sine';
-    gain.gain.setValueAtTime(vol || 0.4, ctx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + (duration || 0.15));
-    osc.start(ctx.currentTime);
-    osc.stop(ctx.currentTime + (duration || 0.15));
+    if (ctx.state === 'suspended') ctx.resume().then(() => _doBeep(ctx, freq, duration, vol));
+    else _doBeep(ctx, freq, duration, vol);
   } catch(e) {}
 }
+function _doBeep(ctx, freq, duration, vol) {
+  const osc  = ctx.createOscillator();
+  const gain = ctx.createGain();
+  osc.connect(gain); gain.connect(ctx.destination);
+  osc.frequency.value = freq || 880;
+  osc.type = 'sine';
+  gain.gain.setValueAtTime(vol || 0.5, ctx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + (duration || 0.15));
+  osc.start(ctx.currentTime);
+  osc.stop(ctx.currentTime + (duration || 0.15));
+}
 function playDoneSound() {
-  playBeep(523, 0.12, 0.5);
-  setTimeout(() => playBeep(659, 0.12, 0.5), 140);
-  setTimeout(() => playBeep(784, 0.22, 0.6), 280);
+  playBeep(523, 0.12, 0.6);
+  setTimeout(() => playBeep(659, 0.12, 0.6), 150);
+  setTimeout(() => playBeep(784, 0.25, 0.7), 300);
 }
 function playCountdownBeep(n) {
-  if (n > 0) playBeep(660, 0.1, 0.35);
+  if (n > 0) playBeep(660, 0.1, 0.4);
   else playDoneSound();
 }
 function speakText(text) {
   if (!('speechSynthesis' in window)) return;
   window.speechSynthesis.cancel();
   const utt = new SpeechSynthesisUtterance(text);
-  utt.lang = 'es-ES'; utt.rate = 1.0; utt.volume = 0.9;
+  // Prefer Spanish voice; fall back to whatever is available
+  const voices = window.speechSynthesis.getVoices();
+  const esVoice = voices.find(v => v.lang.startsWith('es')) || voices[0];
+  if (esVoice) utt.voice = esVoice;
+  utt.lang = 'es-ES'; utt.rate = 1.05; utt.volume = 1.0; utt.pitch = 1.0;
   window.speechSynthesis.speak(utt);
+}
+// iOS fires voiceschanged late — re-cache them
+if ('speechSynthesis' in window) {
+  window.speechSynthesis.addEventListener('voiceschanged', () => window.speechSynthesis.getVoices());
 }
 
 // ═══════════════════════════════════════════════════
@@ -3215,8 +3419,9 @@ function startRest(seconds, exId) {
     if (remaining <= 0) {
       clearInterval(restInterval);
       skipRest();
-      playCountdownBeep(0);
+      playDoneSound();
       if (navigator.vibrate) navigator.vibrate([200, 100, 200]);
+      speakText('¡A por la siguiente serie!');
     }
   }, 1000);
 }
@@ -3259,6 +3464,7 @@ function guardarSesion() {
 
   addSession({ fecha: todayKey(), tipo: currentEntrenoDay, exercises, ts: Date.now(), nota, ratings });
 
+  clearDraft(); // session saved — remove draft
   // Reset notes UI
   currentSessionSets = {};
   sessionRatings = { energia: 0, recuperacion: 0, motivacion: 0 };
@@ -3360,6 +3566,7 @@ function showSessionSummary(report, newRecords) {
 
 function limpiarSesion() {
   currentSessionSets = {};
+  clearDraft();
   renderEntreno(currentEntrenoDay);
 }
 
@@ -3546,8 +3753,78 @@ let _photoType = 'progreso';
 let _photoPose = 'frontal';
 let _photoDataUrl = null;
 
-function getPhotos() { return ls('progress_photos_v1', []); }
-function savePhotos(arr) { lsSet('progress_photos_v1', arr); }
+// ══════════════════════════════════════════
+// FOTOS — IndexedDB (evita llenar localStorage)
+// ══════════════════════════════════════════
+
+const PHOTO_DB_NAME = 'transfisica_photos';
+const PHOTO_DB_VER = 1;
+const PHOTO_STORE = 'photos';
+
+function openPhotoDB() {
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open(PHOTO_DB_NAME, PHOTO_DB_VER);
+    req.onupgradeneeded = e => {
+      const db = e.target.result;
+      if (!db.objectStoreNames.contains(PHOTO_STORE)) {
+        const store = db.createObjectStore(PHOTO_STORE, { keyPath: 'id', autoIncrement: true });
+        store.createIndex('fecha', 'fecha', { unique: false });
+      }
+    };
+    req.onsuccess = e => resolve(e.target.result);
+    req.onerror = e => reject(e.target.error);
+  });
+}
+
+async function idbGetAllPhotos() {
+  try {
+    const db = await openPhotoDB();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(PHOTO_STORE, 'readonly');
+      const req = tx.objectStore(PHOTO_STORE).getAll();
+      req.onsuccess = () => resolve(req.result || []);
+      req.onerror = () => resolve([]);
+    });
+  } catch { return []; }
+}
+
+async function idbSavePhoto(photo) {
+  try {
+    const db = await openPhotoDB();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(PHOTO_STORE, 'readwrite');
+      const req = tx.objectStore(PHOTO_STORE).add(photo);
+      req.onsuccess = () => resolve(req.result);
+      req.onerror = () => reject(req.error);
+    });
+  } catch (e) { throw e; }
+}
+
+async function idbDeletePhoto(id) {
+  try {
+    const db = await openPhotoDB();
+    return new Promise((resolve) => {
+      const tx = db.transaction(PHOTO_STORE, 'readwrite');
+      tx.objectStore(PHOTO_STORE).delete(id);
+      tx.oncomplete = resolve;
+    });
+  } catch {}
+}
+
+// Migrar fotos antiguas de localStorage a IndexedDB (one-time)
+async function migratePhotosToIDB() {
+  const oldPhotos = ls('progress_photos_v1', []);
+  if (!oldPhotos.length) return;
+  const existing = await idbGetAllPhotos();
+  if (existing.length) { localStorage.removeItem('progress_photos_v1'); return; }
+  for (const p of oldPhotos) {
+    await idbSavePhoto(p).catch(() => {});
+  }
+  localStorage.removeItem('progress_photos_v1');
+}
+
+// getPhotos / savePhotos → now use IndexedDB (see idbGetAllPhotos/idbSavePhoto)
+function getPhotos() { return ls('progress_photos_v1', []); } // legacy - only used during migration
 
 function openPhotoModal() {
   _photoType = 'progreso'; _photoPose = 'frontal'; _photoDataUrl = null;
@@ -3588,16 +3865,27 @@ function handlePhotoUpload(e) {
 
 function savePhoto() {
   if (!_photoDataUrl) return;
-  const photos = getPhotos();
-  photos.push({ fecha: todayKey(), tipo: _photoType, pose: _photoPose, data: _photoDataUrl, semana: getCurrentPlanState().semana });
-  savePhotos(photos);
-  document.getElementById('photo-modal').style.display = 'none';
-  renderPhotoSection();
-  showToast('✓ Foto guardada');
+  const btn = document.getElementById('photo-save-btn');
+  if (btn) { btn.disabled = true; btn.textContent = 'Guardando…'; }
+  const photo = { fecha: todayKey(), tipo: _photoType, pose: _photoPose, data: _photoDataUrl, semana: getCurrentPlanState().semana };
+  idbSavePhoto(photo).then(() => {
+    document.getElementById('photo-modal').style.display = 'none';
+    _photoDataUrl = null;
+    renderPhotoSectionAsync();
+    showToast('✓ Foto guardada');
+  }).catch(() => {
+    showToast('Error guardando foto');
+  }).finally(() => {
+    if (btn) { btn.disabled = false; btn.textContent = '💾 Guardar foto'; }
+  });
 }
 
 function renderPhotoSection() {
-  const photos = getPhotos();
+  renderPhotoSectionAsync();
+}
+
+async function renderPhotoSectionAsync() {
+  const photos = await idbGetAllPhotos();
 
   // Slots inicio / actual
   const inicio  = [...photos].reverse().find(p => p.tipo === 'inicio'  && p.pose === 'frontal');
@@ -3858,11 +4146,35 @@ function renderGuia() {
 function getCheckins() { return ls('checkins_v1', []); }
 function addCheckin(c) { const arr = getCheckins(); arr.push(c); lsSet('checkins_v1', arr); }
 
+function _buildStarWidget(containerId, inputId) {
+  const el = document.getElementById(containerId);
+  if (!el || el.dataset.built) return;
+  el.dataset.built = '1';
+  const inp = document.getElementById(inputId);
+  for (let i = 1; i <= 5; i++) {
+    const b = document.createElement('button');
+    b.type = 'button'; b.dataset.val = i;
+    b.style.cssText = 'width:38px;height:38px;border-radius:50%;border:2px solid var(--border);background:var(--surface);font-size:20px;cursor:pointer;transition:all .15s;color:var(--border);';
+    b.textContent = '★';
+    b.onclick = function() {
+      const v = parseInt(this.dataset.val);
+      inp.value = v * 2;
+      el.querySelectorAll('button').forEach((bb, idx) => {
+        bb.style.color = idx < v ? 'var(--yellow)' : 'var(--border)';
+        bb.style.borderColor = idx < v ? 'var(--yellow)' : 'var(--border)';
+      });
+    };
+    el.appendChild(b);
+  }
+}
+
 function openCheckin() {
   const state = getCurrentPlanState();
   const lbl = document.getElementById('ci-semana-label');
   if (lbl) lbl.textContent = `Semana ${state.semana} · ${new Date().toLocaleDateString('es-ES',{day:'numeric',month:'long',year:'numeric'})}`;
   document.getElementById('checkin-overlay').style.display = 'block';
+  _buildStarWidget('ci-sueno-stars', 'ci-suenoq');
+  _buildStarWidget('ci-energia-stars', 'ci-energia');
 }
 
 function closeCheckin() {
@@ -4379,19 +4691,24 @@ function registerSW() {
 // EXPORT / IMPORT DE DATOS
 // ══════════════════════════════════════════
 
-function exportData() {
+async function exportData() {
   const allKeys = Object.keys(localStorage);
   const data = {};
   allKeys.forEach(k => {
     try { data[k] = JSON.parse(localStorage.getItem(k)); } catch { data[k] = localStorage.getItem(k); }
   });
-  const blob = new Blob([JSON.stringify({ version: 2, exportedAt: new Date().toISOString(), data }, null, 2)], { type: 'application/json' });
+  // Include IndexedDB photos
+  const photos = await idbGetAllPhotos();
+  if (photos.length) data['_idb_photos'] = photos;
+
+  const blob = new Blob([JSON.stringify({ version: 3, exportedAt: new Date().toISOString(), data }, null, 2)], { type: 'application/json' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
   a.download = `transfisica-backup-${new Date().toISOString().slice(0,10)}.json`;
   a.click();
   URL.revokeObjectURL(url);
+  localStorage.setItem('lastBackup', new Date().toISOString().slice(0,10));
   showToast('Backup descargado ✓');
 }
 
@@ -4403,14 +4720,32 @@ function importData() {
     const file = e.target.files[0];
     if (!file) return;
     const reader = new FileReader();
-    reader.onload = ev => {
+    reader.onload = async ev => {
       try {
         const parsed = JSON.parse(ev.target.result);
-        const importObj = parsed.version === 2 ? parsed.data : parsed;
-        if (!confirm('¿Importar datos del ' + (parsed.exportedAt ? parsed.exportedAt.slice(0,10) : 'archivo') + '? Esto sobreescribirá los datos actuales.')) return;
+        const importObj = parsed.version >= 2 ? parsed.data : parsed;
+        const date = parsed.exportedAt ? parsed.exportedAt.slice(0,10) : 'archivo';
+        if (!confirm('¿Importar datos del ' + date + '? Esto sobreescribirá los datos actuales.')) return;
+        
+        // Restore localStorage keys
         Object.entries(importObj).forEach(([k, v]) => {
+          if (k === '_idb_photos') return; // handled separately
           localStorage.setItem(k, typeof v === 'string' ? v : JSON.stringify(v));
         });
+        
+        // Restore IndexedDB photos
+        if (importObj._idb_photos && importObj._idb_photos.length) {
+          const db = await openPhotoDB();
+          const tx = db.transaction(PHOTO_STORE, 'readwrite');
+          const store = tx.objectStore(PHOTO_STORE);
+          store.clear();
+          for (const p of importObj._idb_photos) {
+            const { id: _, ...photoWithoutId } = p;
+            store.add(photoWithoutId);
+          }
+          await new Promise(r => { tx.oncomplete = r; });
+        }
+        
         showToast('Datos importados ✓ — recargando…');
         setTimeout(() => location.reload(), 1200);
       } catch {
@@ -5134,6 +5469,7 @@ function checkIOSInstallBanner() {
 document.addEventListener('DOMContentLoaded', () => {
   setupManifest();
   registerSW();
+  migratePhotosToIDB();
   checkIOSInstallBanner();
 
   // Seed biométricos de evaluación inicial si el array está vacío
