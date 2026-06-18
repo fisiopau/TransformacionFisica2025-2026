@@ -728,103 +728,105 @@ html.dark select.input { background: var(--surface); }
 ═══════════════════════════════════════════ -->
 <section id="tab-hoy" class="tab-content active">
 
-  <!-- Hero Card -->
-  <div class="hero-card">
-    <!-- Top row: phase + dark mode toggle -->
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
-      <div id="hoy-phase" style="font-size:11px;font-weight:800;color:var(--accent);text-transform:uppercase;letter-spacing:0.12em;">Cargando...</div>
-      <button class="dark-toggle" onclick="toggleDarkMode()" title="Modo oscuro" aria-label="Alternar modo oscuro">
-        <svg id="dark-icon-moon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-        <svg id="dark-icon-sun" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none;"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
-      </button>
+  <!-- HEADER: fecha + dark mode -->
+  <div style="display:flex;align-items:center;justify-content:space-between;padding:4px 16px 0;">
+    <div>
+      <div id="hoy-fecha" style="font-size:12px;font-weight:700;color:var(--muted);text-transform:capitalize;letter-spacing:0.02em;">—</div>
+      <div id="hoy-phase" style="font-size:11px;font-weight:800;color:var(--accent);text-transform:uppercase;letter-spacing:0.1em;margin-top:1px;">—</div>
     </div>
-    <!-- Main row: day + score ring -->
+    <button class="dark-toggle" onclick="toggleDarkMode()" title="Modo oscuro" aria-label="Alternar modo oscuro">
+      <svg id="dark-icon-moon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      <svg id="dark-icon-sun" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none;"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+    </button>
+  </div>
+
+  <!-- SESIÓN DE HOY — card principal, acción clara -->
+  <div style="margin:10px 16px 0;padding:16px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);box-shadow:var(--shadow);">
     <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;">
-      <div>
-        <div id="hoy-day" class="hero-day">Día —</div>
-        <div id="hoy-sub" class="hero-sub" style="margin-top:3px;font-size:11px;color:var(--text2);font-weight:500;max-width:220px;line-height:1.4;">—</div>
-        <div id="hoy-fecha" style="font-size:11px;color:var(--muted);font-weight:600;margin-top:6px;text-transform:uppercase;letter-spacing:0.06em;">—</div>
+      <div style="flex:1;min-width:0;">
+        <div style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px;">Hoy entrenas</div>
+        <div id="hoy-sesion-nombre" style="font-size:22px;font-weight:900;font-family:'Barlow Condensed',sans-serif;letter-spacing:-0.01em;line-height:1.1;">—</div>
+        <div id="hoy-sesion-desc" style="font-size:11px;color:var(--muted);margin-top:4px;line-height:1.4;">—</div>
       </div>
-      <!-- Readiness Score Ring -->
-      <div style="display:flex;flex-direction:column;align-items:center;gap:3px;flex-shrink:0;">
+      <!-- Readiness ring -->
+      <div style="display:flex;flex-direction:column;align-items:center;gap:2px;flex-shrink:0;">
         <div class="score-ring-wrap">
-          <svg viewBox="0 0 72 72" xmlns="http://www.w3.org/2000/svg">
-            <circle class="score-ring-track" cx="36" cy="36" r="30"/>
-            <circle class="score-ring-fill" id="score-ring-fill" cx="36" cy="36" r="30"
-              stroke-dasharray="188.5" stroke-dashoffset="188.5" stroke="var(--accent)"/>
-          </svg>
+          <svg viewBox="0 0 72 72"><circle class="score-ring-track" cx="36" cy="36" r="30"/><circle class="score-ring-fill" id="score-ring-fill" cx="36" cy="36" r="30" stroke-dasharray="188.5" stroke-dashoffset="188.5" stroke="var(--accent)"/></svg>
           <div class="score-ring-inner">
             <div class="score-num" id="readiness-val" style="color:var(--accent);">—</div>
-            <div class="score-lbl" style="color:var(--muted);" id="readiness-lbl">HOY</div>
+            <div class="score-lbl" id="readiness-lbl">HOY</div>
           </div>
         </div>
-        <div style="font-size:9px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;" id="readiness-tag">—</div>
+        <div style="font-size:9px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.06em;" id="readiness-tag">Forma</div>
       </div>
     </div>
-    <!-- Plan progress widgets -->
-    <div class="ppw" style="margin-top:14px;">
-      <div class="ppw-item"><div class="ppw-val" id="hoy-diatotal">—</div><div class="ppw-lbl">Día</div></div>
-      <div class="ppw-item"><div class="ppw-val" id="hoy-semana">—</div><div class="ppw-lbl">Semana</div></div>
-      <div class="ppw-item"><div class="ppw-val" id="hoy-restantes">—</div><div class="ppw-lbl">Quedan</div></div>
-      <div class="ppw-item"><div class="ppw-val" id="hoy-pct">—</div><div class="ppw-lbl">Hecho</div></div>
-    </div>
-    <div style="margin-top:10px;">
-      <div class="progress-bar">
+    <!-- Barra progreso plan + botón -->
+    <div style="margin-top:14px;">
+      <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--muted);margin-bottom:4px;">
+        <span id="hoy-sub" style="font-weight:600;">—</span>
+        <span>Sem <span id="hoy-semana">—</span> · <span id="hoy-pct">—</span></span>
+      </div>
+      <div class="progress-bar" style="margin-bottom:12px;">
         <div id="hoy-bar" class="progress-fill" style="background:linear-gradient(90deg,var(--accent),var(--accent2));width:0%"></div>
       </div>
+      <button class="btn btn-primary btn-block" style="font-size:15px;padding:13px;" onclick="goToEntrenoHoy()">Ir al entrenamiento →</button>
     </div>
+    <!-- IDs ocultos para compatibilidad JS -->
+    <span id="hoy-day" style="display:none;"></span>
+    <span id="hoy-diatotal" style="display:none;"></span>
+    <span id="hoy-restantes" style="display:none;"></span>
   </div>
 
-  <!-- Sesión de Hoy -->
-  <div class="section-title">Sesión de Hoy</div>
-  <div class="card" style="margin:0 16px;">
-    <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 16px;">
-      <div style="flex:1;min-width:0;">
-        <div id="hoy-sesion-nombre" style="font-size:17px;font-weight:800;letter-spacing:-0.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">—</div>
-        <div id="hoy-sesion-desc" style="font-size:12px;color:var(--muted);margin-top:3px;">—</div>
+  <!-- CHECKLIST + BIOMÉTRICOS en acordeón -->
+  <div style="margin:12px 16px 0;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;box-shadow:var(--shadow);">
+
+    <!-- Checklist -->
+    <details open>
+      <summary style="display:flex;align-items:center;justify-content:space-between;padding:13px 16px;cursor:pointer;list-style:none;font-size:13px;font-weight:800;">
+        <span>Checklist diario</span>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span id="checklist-score" style="font-size:13px;font-weight:800;color:var(--green);">0/6</span>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+      </summary>
+      <div style="border-top:1px solid var(--border);">
+        <div id="checklist-container"></div>
+        <div class="streak-row" style="border-top:1px solid var(--border);">
+          <div><div class="streak-num" id="streak-count">0</div><div class="streak-lbl">días perfectos seguidos</div></div>
+          <div style="font-size:13px;font-weight:700;color:var(--accent);">🔥 Racha</div>
+        </div>
       </div>
-      <button class="btn btn-primary" style="flex-shrink:0;" onclick="goToEntrenoHoy()">Iniciar →</button>
-    </div>
-  </div>
+    </details>
 
-  <!-- Checklist -->
-  <div class="section-title" style="display:flex;align-items:center;justify-content:space-between;padding-right:16px;">
-    Checklist Diario
-    <span id="checklist-score" style="font-size:14px;font-weight:800;color:var(--green);">0/6</span>
-  </div>
-  <div class="card" style="margin:0 16px;">
-    <div id="checklist-container"></div>
-    <div class="streak-row">
-      <div>
-        <div class="streak-num" id="streak-count">0</div>
-        <div class="streak-lbl">días perfectos seguidos</div>
+    <!-- Separador -->
+    <div style="border-top:1px solid var(--border);"></div>
+
+    <!-- Biométricos -->
+    <details>
+      <summary style="display:flex;align-items:center;justify-content:space-between;padding:13px 16px;cursor:pointer;list-style:none;font-size:13px;font-weight:800;">
+        <span>Biométricos de hoy</span>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+      </summary>
+      <div style="border-top:1px solid var(--border);padding:14px 16px;">
+        <div class="bio-form">
+          <div class="row">
+            <div class="col"><label>Peso (kg)</label><input type="number" class="input" id="bio-peso" step="0.05" placeholder="74.6" inputmode="decimal"></div>
+            <div class="col"><label>% Grasa</label><input type="number" class="input" id="bio-grasa" step="0.1" placeholder="16.9" inputmode="decimal"></div>
+            <div class="col"><label>HRV (ms)</label><input type="number" class="input" id="bio-hrv" placeholder="39" inputmode="numeric"></div>
+          </div>
+          <div class="row">
+            <div class="col"><label>FC reposo (bpm)</label><input type="number" class="input" id="bio-fc" placeholder="52" inputmode="numeric"></div>
+            <div class="col"><label>Sueño (horas)</label><input type="number" class="input" id="bio-sueno" step="0.5" placeholder="7.5" inputmode="decimal"></div>
+          </div>
+          <button class="btn btn-primary btn-block" onclick="guardarBio()">Guardar biométricos</button>
+        </div>
       </div>
-      <div style="font-size:13px;font-weight:700;color:var(--accent);">🔥 Racha</div>
-    </div>
+    </details>
   </div>
 
-  <!-- Alertas automáticas de protocolo -->
-  <div id="auto-alerts-section" style="display:none;">
-    <div class="section-title">Ajuste automático de protocolo</div>
-    <div id="auto-alerts-container" style="margin:0 16px;display:flex;flex-direction:column;gap:6px;"></div>
-  </div>
-
-  <!-- Biométricos rápidos -->
-  <div class="section-title">Biométricos Rápidos</div>
-  <div class="card" style="margin:0 16px;">
-
-    <div class="bio-form">
-      <div class="row">
-        <div class="col"><label>Peso (kg)</label><input type="number" class="input" id="bio-peso" step="0.05" placeholder="74.6" inputmode="decimal"></div>
-        <div class="col"><label>% Grasa</label><input type="number" class="input" id="bio-grasa" step="0.1" placeholder="16.9" inputmode="decimal"></div>
-        <div class="col"><label>HRV (ms)</label><input type="number" class="input" id="bio-hrv" placeholder="39" inputmode="numeric"></div>
-      </div>
-      <div class="row">
-        <div class="col"><label>FC reposo (bpm)</label><input type="number" class="input" id="bio-fc" placeholder="52" inputmode="numeric"></div>
-        <div class="col"><label>Sueño (horas)</label><input type="number" class="input" id="bio-sueno" step="0.5" placeholder="7.5" inputmode="decimal"></div>
-      </div>
-      <button class="btn btn-primary btn-block" onclick="guardarBio()">Guardar biométricos</button>
-    </div>
+  <!-- Alertas automáticas -->
+  <div id="auto-alerts-section" style="display:none;margin:12px 16px 0;">
+    <div id="auto-alerts-container" style="display:flex;flex-direction:column;gap:6px;"></div>
   </div>
 
 </section>
