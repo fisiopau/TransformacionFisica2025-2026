@@ -4795,22 +4795,50 @@ function stopScanner() {
 function showManualBarcodeInput() {
   const existing = document.getElementById('manual-barcode-input');
   if (existing) { existing.focus(); return; }
+
   const wrap = document.createElement('div');
   wrap.id = 'manual-barcode-input';
-  wrap.style.cssText = 'position:absolute;bottom:calc(var(--safe-b,0px) + 210px);left:16px;right:16px;z-index:20;display:flex;gap:8px;';
+  wrap.style.cssText = 'position:absolute;bottom:calc(var(--safe-b,0px) + 200px);left:16px;right:16px;z-index:20;';
+
+  const label = document.createElement('div');
+  label.textContent = 'Introduce el código de barras:';
+  label.style.cssText = 'color:rgba(255,255,255,0.7);font-size:12px;font-weight:600;text-align:center;margin-bottom:8px;letter-spacing:0.04em;text-transform:uppercase;';
+
+  const row = document.createElement('div');
+  row.style.cssText = 'display:flex;gap:8px;';
+
   const input = document.createElement('input');
-  input.type = 'tel'; input.inputMode = 'numeric';
-  input.placeholder = '8410076471058';
-  input.style.cssText = 'flex:1;background:rgba(255,255,255,0.14);border:1.5px solid rgba(255,255,255,0.35);border-radius:10px;color:#fff;font-size:17px;padding:13px 14px;text-align:center;outline:none;';
+  input.type = 'tel';
+  input.inputMode = 'numeric';
+  input.placeholder = 'Ej: 8410076471058';
+  input.style.cssText = 'flex:1;background:rgba(255,255,255,0.14);border:2px solid rgba(249,115,22,0.6);border-radius:10px;color:#fff;font-size:17px;padding:13px 14px;text-align:center;outline:none;';
+
   const btn = document.createElement('button');
-  btn.textContent = '→';
-  btn.style.cssText = 'background:var(--accent);border:none;border-radius:10px;color:#fff;font-size:20px;font-weight:700;padding:0 18px;cursor:pointer;';
-  btn.onclick = async () => {
-    const v = input.value.replace(/\D/g,'');
-    if (v.length >= 8) await lookupBarcode(v);
-  };
-  input.addEventListener('keydown', e => { if (e.key === 'Enter') btn.click(); });
-  wrap.appendChild(input); wrap.appendChild(btn);
+  btn.textContent = 'Buscar';
+  btn.style.cssText = 'background:var(--accent);border:none;border-radius:10px;color:#fff;font-size:14px;font-weight:700;padding:0 16px;cursor:pointer;white-space:nowrap;';
+
+  async function tryLookup() {
+    const v = input.value.replace(/\D/g, '');
+    if (v.length < 8) return;
+    btn.textContent = '…';
+    btn.disabled = true;
+    await lookupBarcode(v);
+    btn.textContent = 'Buscar';
+    btn.disabled = false;
+  }
+
+  btn.onclick = tryLookup;
+  // Auto-search when 13 digits entered (EAN-13)
+  input.addEventListener('input', () => {
+    const v = input.value.replace(/\D/g, '');
+    if (v.length === 13 || v.length === 8) tryLookup();
+  });
+  input.addEventListener('keydown', e => { if (e.key === 'Enter') tryLookup(); });
+
+  row.appendChild(input);
+  row.appendChild(btn);
+  wrap.appendChild(label);
+  wrap.appendChild(row);
   document.getElementById('scanner-overlay').appendChild(wrap);
   setTimeout(() => input.focus(), 200);
 }
