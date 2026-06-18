@@ -1576,65 +1576,76 @@ html.dark select.input { background: var(--surface); }
 <!-- TAB: PROGRAMA -->
 <section id="tab-programa" class="tab-content">
 
-  <!-- HERO: estado actual -->
-  <div style="margin:0 16px 8px;padding:16px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);box-shadow:var(--shadow);">
-    <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px;">
+  <!-- HEADER: fase + semana actual -->
+  <div style="margin:0 16px 12px;padding:18px 16px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);box-shadow:var(--shadow);">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
       <div>
         <div style="font-size:10px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:0.08em;">Plan activo</div>
-        <div style="font-size:17px;font-weight:900;font-family:'Barlow Condensed',sans-serif;margin-top:1px;">Transformación 2025–2026</div>
+        <div style="font-size:19px;font-weight:900;font-family:'Playfair Display',serif;margin-top:2px;">Transformación Física</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:1px;">2025 → 2026</div>
       </div>
-      <div id="prog-deload-badge" style="display:none;background:var(--accent);color:#fff;font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px;margin-top:2px;">DELOAD</div>
+      <div id="prog-deload-badge" style="display:none;background:var(--accent);color:#fff;font-size:10px;font-weight:700;padding:4px 10px;border-radius:20px;">DELOAD</div>
     </div>
-    <!-- Stats row -->
-    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:14px;">
-      <div style="text-align:center;padding:8px 4px;background:var(--surface2);border-radius:10px;">
-        <div style="font-size:20px;font-weight:900;font-family:'Barlow Condensed',sans-serif;color:var(--accent);" id="prog-dia">—</div>
-        <div style="font-size:9px;color:var(--muted);font-weight:600;text-transform:uppercase;">Día</div>
-      </div>
-      <div style="text-align:center;padding:8px 4px;background:var(--surface2);border-radius:10px;">
-        <div style="font-size:20px;font-weight:900;font-family:'Barlow Condensed',sans-serif;color:var(--text);" id="prog-semana">—</div>
-        <div style="font-size:9px;color:var(--muted);font-weight:600;text-transform:uppercase;">Semana</div>
-      </div>
-      <div style="text-align:center;padding:8px 4px;background:var(--surface2);border-radius:10px;">
-        <div style="font-size:20px;font-weight:900;font-family:'Barlow Condensed',sans-serif;" id="prog-fase">—</div>
-        <div style="font-size:9px;color:var(--muted);font-weight:600;text-transform:uppercase;">Fase</div>
-      </div>
-      <div style="text-align:center;padding:8px 4px;background:var(--surface2);border-radius:10px;">
-        <div style="font-size:20px;font-weight:900;font-family:'Barlow Condensed',sans-serif;color:var(--muted);" id="prog-restantes">—</div>
-        <div style="font-size:9px;color:var(--muted);font-weight:600;text-transform:uppercase;">Quedan</div>
+    <!-- Fase actual + barra -->
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+      <div id="prog-fase-dot" style="width:10px;height:10px;border-radius:50%;background:var(--accent);flex-shrink:0;"></div>
+      <div style="flex:1;">
+        <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
+          <span id="prog-fase-nombre" style="font-size:12px;font-weight:700;color:var(--text);">—</span>
+          <span id="prog-pct-fase" style="font-size:11px;color:var(--muted);">0%</span>
+        </div>
+        <div style="height:5px;background:var(--surface2);border-radius:3px;overflow:hidden;">
+          <div id="prog-bar-fase" style="height:100%;width:0%;border-radius:3px;transition:width .4s;"></div>
+        </div>
       </div>
     </div>
-    <!-- Barras progreso -->
-    <div style="margin-bottom:6px;">
-      <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--muted);margin-bottom:3px;"><span id="prog-fase-nombre">—</span><span id="prog-pct-fase">0%</span></div>
-      <div class="progress-bar" style="height:6px;"><div id="prog-bar-fase" class="progress-fill" style="width:0%;height:6px;border-radius:3px;"></div></div>
+    <!-- Plan total -->
+    <div style="display:flex;align-items:center;gap:10px;">
+      <div style="width:10px;height:10px;border-radius:50%;background:var(--border);flex-shrink:0;"></div>
+      <div style="flex:1;">
+        <div style="display:flex;justify-content:space-between;margin-bottom:4px;">
+          <span style="font-size:11px;color:var(--muted);">Plan completo · <span id="prog-restantes">—</span> días restantes</span>
+          <span id="prog-pct-total" style="font-size:11px;color:var(--muted);">0%</span>
+        </div>
+        <div style="height:4px;background:var(--surface2);border-radius:3px;overflow:hidden;">
+          <div id="prog-bar-total" style="height:100%;width:0%;border-radius:3px;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width .4s;"></div>
+        </div>
+      </div>
     </div>
-    <div>
-      <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--muted);margin-bottom:3px;"><span>Plan completo</span><span id="prog-pct-total">0%</span></div>
-      <div class="progress-bar" style="height:6px;"><div id="prog-bar-total" class="progress-fill" style="width:0%;height:6px;border-radius:3px;background:linear-gradient(90deg,var(--accent),var(--accent2));"></div></div>
-    </div>
-    <div id="prog-week-meta" style="margin-top:10px;padding:8px 10px;background:var(--surface2);border-radius:8px;font-size:11px;color:var(--text2);line-height:1.5;"></div>
+    <!-- IDs ocultos para compatibilidad con JS existente -->
+    <span id="prog-dia" style="display:none;"></span>
+    <span id="prog-semana" style="display:none;"></span>
+    <span id="prog-fase" style="display:none;"></span>
   </div>
 
-  <!-- HORARIO SEMANA ACTUAL -->
+  <!-- ESTA SEMANA -->
   <div class="section-title">Esta semana</div>
-  <div style="margin:0 16px 8px;" id="prog-week-schedule"></div>
+  <div style="margin:0 16px 12px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;box-shadow:var(--shadow);">
+    <div id="prog-week-meta-card" style="padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;gap:10px;">
+      <div id="prog-week-meta-dot" style="width:8px;height:8px;border-radius:50%;background:var(--accent);margin-top:4px;flex-shrink:0;"></div>
+      <div>
+        <div id="prog-week-meta-sem" style="font-size:12px;font-weight:800;color:var(--text);margin-bottom:2px;">Semana —</div>
+        <div id="prog-week-meta" style="font-size:11px;color:var(--muted);line-height:1.5;"></div>
+      </div>
+    </div>
+    <div id="prog-week-schedule" style="padding:8px 0;"></div>
+  </div>
 
   <!-- ROADMAP -->
-  <div class="section-title">Roadmap 24 semanas</div>
-  <div class="card" style="margin:0 16px 8px;padding:14px 16px;">
-    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px;">
-      <div style="display:flex;align-items:center;gap:5px;font-size:10px;color:var(--muted);"><div style="width:8px;height:8px;border-radius:2px;background:#f97316;"></div>F1 · Recomposición (S1–8)</div>
-      <div style="display:flex;align-items:center;gap:5px;font-size:10px;color:var(--muted);"><div style="width:8px;height:8px;border-radius:2px;background:#3b82f6;"></div>F2 · Volumen (S9–12)</div>
-      <div style="display:flex;align-items:center;gap:5px;font-size:10px;color:var(--muted);"><div style="width:8px;height:8px;border-radius:2px;background:#a855f7;"></div>F3 · Hyrox (S13–24)</div>
-      <div style="display:flex;align-items:center;gap:5px;font-size:10px;color:var(--muted);"><div style="width:8px;height:8px;border-radius:2px;border:1.5px dashed var(--muted);"></div>Deload</div>
+  <div class="section-title">Las 24 semanas</div>
+  <div style="margin:0 16px 12px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:16px;box-shadow:var(--shadow);">
+    <div style="display:flex;gap:14px;flex-wrap:wrap;margin-bottom:14px;">
+      <div style="display:flex;align-items:center;gap:6px;font-size:11px;font-weight:600;color:var(--text2);"><div style="width:10px;height:10px;border-radius:3px;background:#f97316;"></div>F1 Recomposición</div>
+      <div style="display:flex;align-items:center;gap:6px;font-size:11px;font-weight:600;color:var(--text2);"><div style="width:10px;height:10px;border-radius:3px;background:#3b82f6;"></div>F2 Volumen</div>
+      <div style="display:flex;align-items:center;gap:6px;font-size:11px;font-weight:600;color:var(--text2);"><div style="width:10px;height:10px;border-radius:3px;background:#a855f7;"></div>F3 Hyrox</div>
+      <div style="display:flex;align-items:center;gap:6px;font-size:11px;font-weight:600;color:var(--muted);"><div style="width:10px;height:10px;border-radius:3px;border:1.5px dashed var(--muted);"></div>Deload</div>
     </div>
     <div id="prog-semanas-grid" class="week-grid"></div>
   </div>
 
   <!-- FASES DETALLE -->
-  <div class="section-title">Detalle por fase</div>
-  <div style="margin:0 16px 16px;" id="prog-fases-list"></div>
+  <div class="section-title">Las 3 fases</div>
+  <div style="margin:0 16px 16px;display:flex;flex-direction:column;gap:10px;" id="prog-fases-list"></div>
 
 </section>
 
@@ -5249,55 +5260,151 @@ function buildTechBadge(badge) {
 
 function renderPrograma() {
   const state = getCurrentPlanState();
+
+  // IDs legacy (hidden, kept for compatibility)
   document.getElementById('prog-dia').textContent = state.diaTotal;
   document.getElementById('prog-semana').textContent = state.semana;
   document.getElementById('prog-fase').textContent = state.fase;
+
+  // Header
   document.getElementById('prog-restantes').textContent = state.diasRestantes;
   document.getElementById('prog-pct-total').textContent = state.pctTotal + '%';
   document.getElementById('prog-bar-total').style.width = state.pctTotal + '%';
   document.getElementById('prog-pct-fase').textContent = state.pctFase + '%';
   document.getElementById('prog-bar-fase').style.width = state.pctFase + '%';
   document.getElementById('prog-bar-fase').style.background = state.faseColor;
+  document.getElementById('prog-fase-dot').style.background = state.faseColor;
   document.getElementById('prog-fase-nombre').textContent = 'F' + state.fase + ' · ' + state.faseNombre;
-  document.getElementById('prog-week-meta').textContent = 'Sem. ' + state.semana + ' — ' + state.weekMeta;
-  const badge = document.getElementById('prog-deload-badge');
-  badge.style.display = state.isDeload ? '' : 'none';
+  document.getElementById('prog-deload-badge').style.display = state.isDeload ? '' : 'none';
 
-  // Grid semanas
+  // Esta semana — meta card
+  document.getElementById('prog-week-meta-sem').textContent = 'Semana ' + state.semana + (state.isDeload ? ' · DELOAD' : '');
+  document.getElementById('prog-week-meta').textContent = state.weekMeta;
+  document.getElementById('prog-week-meta-dot').style.background = state.faseColor;
+
+  // Esta semana — horario días
+  const { schedule, sessions } = getProgramForWeek(state.semana);
+  const dayNames = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+  const today = new Date().getDay();
+  const schedEl = document.getElementById('prog-week-schedule');
+  schedEl.innerHTML = dayNames.map((d, i) => {
+    const key = schedule[i] || 'rest';
+    const ses = sessions[key] || { name: 'Descanso', sub: 'Recuperación activa' };
+    const isToday = i === today;
+    const isRest = key === 'rest';
+    return `<div style="display:flex;align-items:center;gap:12px;padding:9px 16px;${isToday ? 'background:' + state.faseColor + '0d;' : ''}${i < 6 ? 'border-bottom:1px solid var(--border);' : ''}">
+      <div style="width:32px;text-align:center;font-size:11px;font-weight:${isToday ? '800' : '600'};color:${isToday ? state.faseColor : 'var(--muted)'};">${d}</div>
+      <div style="flex:1;">
+        <div style="font-size:13px;font-weight:${isToday ? '800' : '600'};color:${isRest ? 'var(--muted)' : 'var(--text)'};">${ses.name}${state.isDeload && !isRest ? ' 🔄' : ''}</div>
+        ${ses.sub ? `<div style="font-size:10px;color:var(--muted);margin-top:1px;">${ses.sub}</div>` : ''}
+      </div>
+      ${isToday ? `<div style="width:6px;height:6px;border-radius:50%;background:${state.faseColor};flex-shrink:0;"></div>` : ''}
+    </div>`;
+  }).join('');
+
+  // Grid 24 semanas
   const grid = document.getElementById('prog-semanas-grid');
   grid.innerHTML = '';
   for (let w = 1; w <= 24; w++) {
-    const color = w <= 8 ? '#f97316' : w <= 12 ? '#3b82f6' : '#a855f7'; // F1·F2·F3
+    const color = w <= 8 ? '#f97316' : w <= 12 ? '#3b82f6' : '#a855f7';
     const isDone = w < state.semana;
     const isCurr = w === state.semana;
     const deload  = isDeloadWeek(w);
     const cell = document.createElement('div');
     cell.className = 'week-cell ' + (isCurr ? 'wk-current' : isDone ? 'wk-done' : 'wk-future');
     cell.innerHTML = `<div class="week-num" style="color:${isCurr || isDone ? '' : color}">${w}</div><div class="week-lbl" style="color:${isCurr ? '' : color + 'aa'}">${deload ? 'DL' : 'S'+w}</div>`;
-    const phaseLabel = w <= 8 ? 'F1' : w <= 12 ? 'F2' : 'F3';
-    cell.title = `Sem. ${w} (${phaseLabel}): ${getWeekMetaExt(w)}`;
+    cell.title = `Sem. ${w}: ${getWeekMetaExt(w)}`;
     cell.onclick = () => showWeekDetail(w);
     grid.appendChild(cell);
   }
 
-  // Fases detalle
+  // Fases — cards expandibles con detalle real
   const fasesData = [
-    { num: 1, nombre: 'Recomposición',    sems: '1–8',   tipo: 'Upper/Lower · Fuerza 3-5 reps · RIR 2-3 · 2450 kcal', color: '#f97316' },
-    { num: 2, nombre: 'Volumen Limpio',   sems: '9–12',  tipo: 'Upper/Lower Hipertrofia · 8-12 reps · RIR 1-2 · 2650 kcal', color: '#3b82f6' },
-    { num: 3, nombre: 'Definición+Hyrox', sems: '13–24', tipo: 'PPL×2 · MEV→MAV→MRV · 8-12 reps · Supersets · 2350 kcal', color: '#a855f7' },
+    {
+      num: 1, nombre: 'Recomposición', sems: '1–8', color: '#f97316',
+      objetivo: 'Perder grasa y ganar fuerza simultáneamente. Establecer técnica y baseline de cargas.',
+      split: 'Upper / Lower × 2 días cada uno',
+      reps: '3–5 reps · RIR 2–3',
+      kcal: '2.450 kcal · 175g proteína',
+      cardio: 'HIIT 2×/sem + LISS 1×/sem post-entreno',
+      progresion: 'Doble progresión: más reps → más peso. Deload sem. 4 y 8.',
+      musculos: ['Pecho', 'Espalda', 'Hombros', 'Pierna', 'Core'],
+    },
+    {
+      num: 2, nombre: 'Volumen Limpio', sems: '9–12', color: '#3b82f6',
+      objetivo: 'Maximizar hipertrofia con estrés metabólico. Circuitos de alta densidad.',
+      split: 'Circuitos metabólicos Upper / Lower',
+      reps: '8–12 reps · RIR 1–2 · descansos cortos',
+      kcal: '2.650 kcal · 185g proteína',
+      cardio: 'HIIT 30/30 3×/sem · descansos progresivamente menores',
+      progresion: 'Descanso decrece de 30s → 15s cada 2 semanas. Deload sem. 12.',
+      musculos: ['Pecho', 'Espalda', 'Hombros', 'Pierna', 'Core', 'Brazos'],
+    },
+    {
+      num: 3, nombre: 'Definición + Hyrox', sems: '13–24', color: '#a855f7',
+      objetivo: 'Definición máxima + rendimiento Hyrox. Fusión fuerza-resistencia.',
+      split: 'PPL × 2 · Push / Pull / Legs 6 días/sem',
+      reps: '8–12 reps · Supersets A-A · Drop sets',
+      kcal: '2.350 kcal · 195g proteína · déficit progresivo',
+      cardio: 'LISS 3×/sem + entrenamiento funcional Hyrox',
+      progresion: 'MEV → MAV → MRV · 10–22 series/grupo/sem. Deload sem. 16 y 24.',
+      musculos: ['Pecho', 'Espalda', 'Hombros', 'Pierna', 'Core', 'Brazos', 'Funcional'],
+    },
   ];
-  document.getElementById('prog-fases-list').innerHTML = fasesData.map(f => `
-    <div style="display:flex;align-items:flex-start;gap:12px;padding:12px 16px;${f.num < 3 ? 'border-bottom:1px solid var(--border-subtle);' : ''}">
-      <div style="width:32px;height:32px;border-radius:8px;background:${f.color}22;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
-        <span style="font-size:13px;font-weight:700;color:${f.color};">F${f.num}</span>
+
+  document.getElementById('prog-fases-list').innerHTML = fasesData.map(f => {
+    const isActive = state.fase === f.num;
+    const isPast = state.fase > f.num;
+    return `
+    <div style="background:var(--surface);border:1.5px solid ${isActive ? f.color + '55' : 'var(--border)'};border-radius:var(--r);overflow:hidden;box-shadow:var(--shadow);">
+      <!-- Cabecera siempre visible -->
+      <div onclick="this.closest('div[data-fase]').querySelector('.fase-body').style.display=this.closest('div[data-fase]').querySelector('.fase-body').style.display==='none'?'block':'none'" data-toggle style="display:flex;align-items:center;gap:12px;padding:14px 16px;cursor:pointer;" data-fase="${f.num}">
+        <div style="width:38px;height:38px;border-radius:10px;background:${f.color}18;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+          <span style="font-size:14px;font-weight:900;color:${f.color};font-family:'Barlow Condensed',sans-serif;">F${f.num}</span>
+        </div>
+        <div style="flex:1;">
+          <div style="font-size:14px;font-weight:800;color:var(--text);">${f.nombre}</div>
+          <div style="font-size:11px;color:var(--muted);margin-top:1px;">Semanas ${f.sems} · ${f.split}</div>
+        </div>
+        ${isActive ? `<div style="font-size:10px;font-weight:700;color:${f.color};padding:3px 9px;background:${f.color}18;border-radius:20px;flex-shrink:0;">AHORA</div>` : ''}
+        ${isPast ? `<div style="font-size:10px;font-weight:700;color:var(--green);padding:3px 9px;background:rgba(22,163,74,0.08);border-radius:20px;flex-shrink:0;">✓</div>` : ''}
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
       </div>
-      <div style="flex:1;">
-        <div style="font-size:13px;font-weight:600;margin-bottom:2px;">${f.nombre} <span style="font-size:11px;font-weight:400;color:var(--muted);">· Sem. ${f.sems}</span></div>
-        <div style="font-size:11px;color:var(--muted);">${f.tipo}</div>
+      <!-- Cuerpo colapsable -->
+      <div class="fase-body" style="display:${isActive ? 'block' : 'none'};border-top:1px solid var(--border);padding:14px 16px;background:var(--surface2);">
+        <div style="font-size:12px;color:var(--text2);line-height:1.6;margin-bottom:12px;">${f.objetivo}</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;">
+          <div style="padding:10px;background:var(--surface);border-radius:10px;border:1px solid var(--border);">
+            <div style="font-size:9px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px;">Reps · RIR</div>
+            <div style="font-size:12px;font-weight:700;color:var(--text);">${f.reps}</div>
+          </div>
+          <div style="padding:10px;background:var(--surface);border-radius:10px;border:1px solid var(--border);">
+            <div style="font-size:9px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px;">Nutrición</div>
+            <div style="font-size:12px;font-weight:700;color:var(--text);">${f.kcal}</div>
+          </div>
+          <div style="padding:10px;background:var(--surface);border-radius:10px;border:1px solid var(--border);">
+            <div style="font-size:9px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px;">Cardio</div>
+            <div style="font-size:11px;font-weight:600;color:var(--text);">${f.cardio}</div>
+          </div>
+          <div style="padding:10px;background:var(--surface);border-radius:10px;border:1px solid var(--border);">
+            <div style="font-size:9px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px;">Progresión</div>
+            <div style="font-size:11px;font-weight:600;color:var(--text);">${f.progresion}</div>
+          </div>
+        </div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;">
+          ${f.musculos.map(m => `<span style="font-size:10px;font-weight:600;padding:3px 8px;background:${f.color}15;color:${f.color};border-radius:6px;">${m}</span>`).join('')}
+        </div>
       </div>
-      ${state.fase === f.num ? `<div style="font-size:10px;font-weight:700;color:${f.color};padding:2px 8px;background:${f.color}22;border-radius:20px;align-self:center;">ACTUAL</div>` : ''}
-    </div>
-  `).join('');
+    </div>`;
+  }).join('');
+
+  // Fix onclick para toggles de fases (usar delegación correcta)
+  document.getElementById('prog-fases-list').querySelectorAll('[data-toggle]').forEach(btn => {
+    btn.onclick = function() {
+      const body = this.parentElement.querySelector('.fase-body');
+      if (body) body.style.display = body.style.display === 'none' ? 'block' : 'none';
+    };
+  });
 }
 
 function showWeekDetail(w) {
