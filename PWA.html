@@ -1572,6 +1572,81 @@ html.dark select.input { background: var(--surface); }
 
   </div><!-- /info-accordion -->
 
+  <!-- PROTOCOLO SUEÑO -->
+  <div class="section-title">Protocolo de sueño</div>
+  <div style="margin:0 16px 16px;display:flex;flex-direction:column;gap:8px;">
+
+    <!-- Contexto personalizado -->
+    <div style="padding:14px 16px;background:rgba(37,99,235,0.06);border:1px solid rgba(37,99,235,0.18);border-radius:var(--r);">
+      <div style="font-size:12px;font-weight:800;color:var(--blue);margin-bottom:6px;">Tu problema específico</div>
+      <div style="font-size:12px;color:var(--text2);line-height:1.7;">Sueño fragmentado + somnolencia 16-18h + 14h de trabajo diario. Tu HRV de 39 ms refleja recuperación incompleta. Cada hora de sueño de mala calidad reduce la síntesis proteica ~18% y aumenta el cortisol basal — directamente contra tus objetivos de recomposición.</div>
+    </div>
+
+    <!-- Tracker rápido -->
+    <div style="padding:14px 16px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);">
+      <div style="font-size:12px;font-weight:800;color:var(--text);margin-bottom:12px;">Registro de hoy</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;">
+        <div>
+          <label style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.06em;">Me acosté</label>
+          <input type="time" id="sleep-bedtime" value="23:00" class="input" style="margin-top:4px;">
+        </div>
+        <div>
+          <label style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.06em;">Me levanté</label>
+          <input type="time" id="sleep-waketime" value="06:30" class="input" style="margin-top:4px;">
+        </div>
+      </div>
+      <div style="margin-bottom:12px;">
+        <label style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.06em;display:block;margin-bottom:8px;">Calidad (1 = fragmentado · 5 = profundo)</label>
+        <div style="display:flex;gap:6px;" id="sleep-quality-btns">
+          <button onclick="setSleepQuality(1)" id="sq-1" style="flex:1;height:36px;border-radius:8px;border:1.5px solid var(--border);background:var(--surface2);font-size:13px;font-weight:700;cursor:pointer;color:var(--muted);">1</button>
+          <button onclick="setSleepQuality(2)" id="sq-2" style="flex:1;height:36px;border-radius:8px;border:1.5px solid var(--border);background:var(--surface2);font-size:13px;font-weight:700;cursor:pointer;color:var(--muted);">2</button>
+          <button onclick="setSleepQuality(3)" id="sq-3" style="flex:1;height:36px;border-radius:8px;border:1.5px solid var(--border);background:var(--surface2);font-size:13px;font-weight:700;cursor:pointer;color:var(--muted);">3</button>
+          <button onclick="setSleepQuality(4)" id="sq-4" style="flex:1;height:36px;border-radius:8px;border:1.5px solid var(--border);background:var(--surface2);font-size:13px;font-weight:700;cursor:pointer;color:var(--muted);">4</button>
+          <button onclick="setSleepQuality(5)" id="sq-5" style="flex:1;height:36px;border-radius:8px;border:1.5px solid var(--border);background:var(--surface2);font-size:13px;font-weight:700;cursor:pointer;color:var(--muted);">5</button>
+        </div>
+      </div>
+      <div style="margin-bottom:12px;">
+        <label style="font-size:10px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.06em;display:block;margin-bottom:6px;">Somnolencia de tarde (16-18h)</label>
+        <div style="display:flex;gap:6px;">
+          <button onclick="setSleepDrowsy('none')" id="sd-none" style="flex:1;padding:8px;border-radius:8px;border:1.5px solid var(--border);background:var(--surface2);font-size:11px;font-weight:700;cursor:pointer;color:var(--muted);">Sin somnolencia</button>
+          <button onclick="setSleepDrowsy('mild')" id="sd-mild" style="flex:1;padding:8px;border-radius:8px;border:1.5px solid var(--border);background:var(--surface2);font-size:11px;font-weight:700;cursor:pointer;color:var(--muted);">Leve</button>
+          <button onclick="setSleepDrowsy('severe')" id="sd-severe" style="flex:1;padding:8px;border-radius:8px;border:1.5px solid var(--border);background:var(--surface2);font-size:11px;font-weight:700;cursor:pointer;color:var(--muted);">Fuerte</button>
+        </div>
+      </div>
+      <button class="btn btn-primary btn-block" onclick="saveSleepLog()">Guardar registro</button>
+    </div>
+
+    <!-- Protocolo -->
+    <details style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;">
+      <summary style="padding:13px 16px;font-size:13px;font-weight:800;cursor:pointer;list-style:none;display:flex;align-items:center;justify-content:space-between;">
+        Protocolo nocturno (qué hacer)
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+      </summary>
+      <div style="border-top:1px solid var(--border);padding:14px 16px;display:flex;flex-direction:column;gap:10px;">
+        <div style="display:flex;gap:12px;align-items:flex-start;"><div style="font-size:10px;font-weight:800;color:var(--blue);min-width:40px;padding-top:1px;">21:30</div><div><div style="font-size:12px;font-weight:800;color:var(--text);margin-bottom:2px;">Luz azul off</div><div style="font-size:11px;color:var(--text2);line-height:1.6;">Cambia el móvil a modo noche o bájale el brillo al mínimo. La luz azul suprime melatonina 2-3h antes de lo necesario.</div></div></div>
+        <div style="display:flex;gap:12px;align-items:flex-start;"><div style="font-size:10px;font-weight:800;color:var(--purple);min-width:40px;padding-top:1px;">22:00</div><div><div style="font-size:12px;font-weight:800;color:var(--text);margin-bottom:2px;">Temperatura habitación</div><div style="font-size:11px;color:var(--text2);line-height:1.6;">Baja el aire o abre la ventana. La temperatura corporal debe bajar 0.5-1°C para iniciar el sueño profundo. Óptimo: 17-19°C.</div></div></div>
+        <div style="display:flex;gap:12px;align-items:flex-start;"><div style="font-size:10px;font-weight:800;color:var(--green);min-width:40px;padding-top:1px;">22:30</div><div><div style="font-size:12px;font-weight:800;color:var(--text);margin-bottom:2px;">Magnesio glicinato</div><div style="font-size:11px;color:var(--text2);line-height:1.6;">200-400mg. El único suplemento con evidencia sólida en sueño fragmentado. Activa receptores GABA y reduce el cortisol nocturno. Tómalo 30-45min antes.</div></div></div>
+        <div style="display:flex;gap:12px;align-items:flex-start;"><div style="font-size:10px;font-weight:800;color:var(--muted);min-width:40px;padding-top:1px;">22:45</div><div><div style="font-size:12px;font-weight:800;color:var(--text);margin-bottom:2px;">Sin pantallas en cama</div><div style="font-size:11px;color:var(--text2);line-height:1.6;">El contexto cama=sueño se rompe con móvil en cama. Si te despiertas de noche no mires la hora — aumenta la ansiedad y alarga el despertar.</div></div></div>
+        <div style="display:flex;gap:12px;align-items:flex-start;"><div style="font-size:10px;font-weight:800;color:var(--accent);min-width:40px;padding-top:1px;">23:00</div><div><div style="font-size:12px;font-weight:800;color:var(--text);margin-bottom:2px;">Hora de acostarse fija</div><div style="font-size:11px;color:var(--text2);line-height:1.6;">El reloj circadiano necesita consistencia. Variar ±30 min ya afecta al sueño REM. Aunque sea fin de semana: 23:00 máximo.</div></div></div>
+      </div>
+    </details>
+
+    <!-- Somnolencia de tarde -->
+    <details style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;">
+      <summary style="padding:13px 16px;font-size:13px;font-weight:800;cursor:pointer;list-style:none;display:flex;align-items:center;justify-content:space-between;">
+        Somnolencia 16-18h — qué hacer
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+      </summary>
+      <div style="border-top:1px solid var(--border);padding:14px 16px;display:flex;flex-direction:column;gap:10px;">
+        <div style="display:flex;gap:12px;align-items:flex-start;"><div style="font-size:18px;flex-shrink:0;">💤</div><div><div style="font-size:12px;font-weight:800;color:var(--text);margin-bottom:2px;">Nap de 20 min (si puedes)</div><div style="font-size:11px;color:var(--text2);line-height:1.6;">Antes de las 15:00h. Pon alarma en 20 min — entras en N1/N2 sin llegar a sueño profundo. Al despertar: 10 min de grogginess luego pico de alerta 30-60 min.</div></div></div>
+        <div style="display:flex;gap:12px;align-items:flex-start;"><div style="font-size:18px;flex-shrink:0;">🌞</div><div><div style="font-size:12px;font-weight:800;color:var(--text);margin-bottom:2px;">10 min de luz solar</div><div style="font-size:11px;color:var(--text2);line-height:1.6;">Sale a la calle entre 14-15h. La luz brillante activa la vía retino-hipotalámica y reinicia el sistema de alerta sin estimulantes.</div></div></div>
+        <div style="display:flex;gap:12px;align-items:flex-start;"><div style="font-size:18px;flex-shrink:0;">🍽️</div><div><div style="font-size:12px;font-weight:800;color:var(--text);margin-bottom:2px;">Ajusta la comida</div><div style="font-size:11px;color:var(--text2);line-height:1.6;">Reduce el carbohidrato refinado (arroz blanco, pan) en la comida de hospital. Añade proteína + grasa. El índice glucémico bajo evita el pico-caída que amplifica la somnolencia.</div></div></div>
+        <div style="display:flex;gap:12px;align-items:flex-start;"><div style="font-size:18px;flex-shrink:0;">🚶</div><div><div style="font-size:12px;font-weight:800;color:var(--text);margin-bottom:2px;">Movimiento suave</div><div style="font-size:11px;color:var(--text2);line-height:1.6;">5 min de caminar o escaleras aumenta el flujo cerebral y reduce la adenosina acumulada sin afectar al sueño nocturno.</div></div></div>
+      </div>
+    </details>
+
+  </div>
+
 </section>
 
 <!-- ══════════ BOTTOM TAB BAR ══════════ -->
@@ -4793,6 +4868,64 @@ async function exportData() {
   URL.revokeObjectURL(url);
   localStorage.setItem('lastBackup', new Date().toISOString().slice(0,10));
   showToast('Backup descargado ✓');
+}
+
+// SLEEP TRACKER
+let _sleepQuality = null;
+let _sleepDrowsy = null;
+
+function setSleepQuality(n) {
+  _sleepQuality = n;
+  [1,2,3,4,5].forEach(i => {
+    const b = document.getElementById('sq-' + i);
+    if (!b) return;
+    const active = i <= n;
+    b.style.background = active ? 'var(--blue)' : 'var(--surface2)';
+    b.style.color = active ? '#fff' : 'var(--muted)';
+    b.style.borderColor = active ? 'var(--blue)' : 'var(--border)';
+  });
+}
+
+function setSleepDrowsy(val) {
+  _sleepDrowsy = val;
+  ['none','mild','severe'].forEach(v => {
+    const b = document.getElementById('sd-' + v);
+    if (!b) return;
+    const active = v === val;
+    b.style.background = active ? 'var(--accent)' : 'var(--surface2)';
+    b.style.color = active ? '#fff' : 'var(--muted)';
+    b.style.borderColor = active ? 'var(--accent)' : 'var(--border)';
+  });
+}
+
+function saveSleepLog() {
+  const bedtime  = document.getElementById('sleep-bedtime').value;
+  const waketime = document.getElementById('sleep-waketime').value;
+  if (!bedtime || !waketime) { showToast('Introduce hora de acostarte y levantarte'); return; }
+
+  // Calcular horas dormidas
+  const [bh, bm] = bedtime.split(':').map(Number);
+  const [wh, wm] = waketime.split(':').map(Number);
+  let mins = (wh * 60 + wm) - (bh * 60 + bm);
+  if (mins < 0) mins += 1440;
+  const hours = Math.round(mins / 60 * 10) / 10;
+
+  const log = { fecha: todayKey(), bedtime, waketime, hours, quality: _sleepQuality, drowsy: _sleepDrowsy };
+  const logs = ls('sleep_logs_v1', []);
+  const existing = logs.findIndex(l => l.fecha === log.fecha);
+  if (existing >= 0) logs[existing] = log; else logs.push(log);
+  lsSet('sleep_logs_v1', logs);
+
+  // Sincronizar con biométricos
+  const bioEl = document.getElementById('bio-sueno');
+  if (bioEl) bioEl.value = hours;
+
+  // Feedback personalizado
+  let msg = `${hours}h registradas`;
+  if (hours < 7) msg += ' — por debajo del mínimo. Prioriza acostarte antes.';
+  else if (_sleepQuality && _sleepQuality <= 2) msg += ' — calidad baja. Revisa el protocolo nocturno.';
+  else msg += ' ✓';
+  showToast(msg);
 }
 
 function loadGoalPhoto(event) {
