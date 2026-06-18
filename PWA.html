@@ -1681,6 +1681,30 @@ html.dark select.input { background: var(--surface); }
   </div>
 </div>
 
+<!-- WEEK DETAIL SHEET -->
+<div id="week-detail-overlay" onclick="if(event.target===this)closeWeekDetail()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:260;align-items:flex-end;justify-content:center;">
+  <div style="background:var(--surface);width:100%;max-width:480px;border-radius:20px 20px 0 0;padding:20px 16px calc(var(--safe-b,0px) + 24px);max-height:85dvh;overflow-y:auto;">
+    <!-- Handle -->
+    <div style="width:36px;height:4px;border-radius:2px;background:var(--border);margin:0 auto 18px;"></div>
+    <!-- Header -->
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px;">
+      <div>
+        <div id="wd-label" style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--muted);margin-bottom:4px;"></div>
+        <div id="wd-title" style="font-size:20px;font-weight:900;font-family:'Barlow Condensed',sans-serif;"></div>
+        <div id="wd-deload" style="display:none;margin-top:6px;display:inline-block;background:var(--accent);color:#fff;font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px;">DELOAD</div>
+      </div>
+      <button onclick="closeWeekDetail()" style="background:var(--surface2);border:1px solid var(--border);border-radius:50%;width:32px;height:32px;color:var(--muted);font-size:18px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;">×</button>
+    </div>
+    <!-- Meta -->
+    <div id="wd-meta" style="font-size:12px;color:var(--text2);line-height:1.6;padding:10px 12px;background:var(--surface2);border-radius:10px;margin-bottom:14px;"></div>
+    <!-- Días de la semana -->
+    <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--muted);margin-bottom:8px;">Horario</div>
+    <div id="wd-schedule" style="background:var(--surface2);border-radius:12px;overflow:hidden;margin-bottom:14px;"></div>
+    <!-- Info fase -->
+    <div id="wd-fase-info" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;"></div>
+  </div>
+</div>
+
 <!-- REST TIMER OVERLAY -->
 <div class="rest-overlay" id="rest-overlay" onclick="skipRest()">
   <div style="text-align:center;color:var(--muted);font-size:13px;font-weight:600;letter-spacing:0.05em;text-transform:uppercase;">DESCANSO</div>
@@ -5418,14 +5442,60 @@ function renderPrograma() {
 }
 
 function showWeekDetail(w) {
-  const fase = w <= 8 ? 'F1 · Recomposición' : w <= 12 ? 'F2 · Volumen Limpio' : 'F3 · Definición+Hyrox';
-  const tipo  = w <= 8 ? 'Upper/Lower · Fuerza 3–5 reps' : w <= 12 ? 'Circuitos 4 rondas · 20–25 reps' : 'PPL×2 · Supersets · 8–12 reps';
+  const faseNum  = w <= 8 ? 1 : w <= 12 ? 2 : 3;
+  const faseColor = faseNum === 1 ? '#f97316' : faseNum === 2 ? '#3b82f6' : '#a855f7';
+  const faseNombre = faseNum === 1 ? 'Recomposición' : faseNum === 2 ? 'Volumen Limpio' : 'Definición + Hyrox';
   const deload = isDeloadWeek(w);
-  const msg = `Sem. ${w} — ${fase}${deload ? ' 🔄 DELOAD' : ''}\n${tipo}\n${getWeekMetaExt(w)}`;
-  showToast(`S${w} · ${fase.split('·')[1].trim()}${deload ? ' · DELOAD' : ''}`);
-  // Actualizar el meta en el hero del programa
-  const metaEl = document.getElementById('prog-week-meta');
-  if (metaEl) metaEl.textContent = `Sem. ${w} — ${getWeekMetaExt(w)}${deload ? ' 🔄 Semana de descarga' : ''}`;
+  const state  = getCurrentPlanState();
+  const isCurr = w === state.semana;
+
+  // Header
+  document.getElementById('wd-label').textContent = `Semana ${w} · F${faseNum} ${faseNombre}`;
+  document.getElementById('wd-label').style.color = faseColor;
+  document.getElementById('wd-title').textContent = deload ? 'Semana de Descarga' : getWeekMetaExt(w).split('·')[0].trim();
+  const deloadBadge = document.getElementById('wd-deload');
+  deloadBadge.style.display = deload ? 'inline-block' : 'none';
+
+  // Meta descripción
+  document.getElementById('wd-meta').textContent = getWeekMetaExt(w);
+
+  // Horario días
+  const { schedule, sessions } = getProgramForWeek(w);
+  const dayNames = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+  document.getElementById('wd-schedule').innerHTML = dayNames.map((d, i) => {
+    const key = schedule[i] || 'rest';
+    const ses = sessions[key] || { name: 'Descanso', sub: 'Recuperación activa' };
+    const isRest = key === 'rest';
+    return `<div style="display:flex;align-items:center;gap:12px;padding:9px 14px;${i < 6 ? 'border-bottom:1px solid var(--border);' : ''}">
+      <div style="width:28px;font-size:11px;font-weight:700;color:${isRest ? 'var(--muted)' : faseColor};">${d}</div>
+      <div style="flex:1;">
+        <div style="font-size:13px;font-weight:${isRest ? '500' : '700'};color:${isRest ? 'var(--muted)' : 'var(--text)'};">${ses.name}${deload && !isRest ? ' 🔄' : ''}</div>
+        ${ses.sub && !isRest ? `<div style="font-size:10px;color:var(--muted);margin-top:1px;">${ses.sub}</div>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+
+  // Info fase compacta
+  const faseInfo = {
+    1: { reps:'3–5 reps · RIR 2–3', kcal:'2.450 kcal · 170g prot', cardio:'HIIT 2×/sem', split:'Upper/Lower' },
+    2: { reps:'8–12 reps · RIR 1–2', kcal:'2.650 kcal · 185g prot', cardio:'HIIT 30/30 3×/sem', split:'Circuitos metabólicos' },
+    3: { reps:'8–12 reps · Supersets', kcal:'2.350 kcal · 195g prot', cardio:'LISS 3×/sem + Hyrox', split:'PPL × 2' },
+  }[faseNum];
+
+  document.getElementById('wd-fase-info').innerHTML = Object.entries(faseInfo).map(([k, v]) => `
+    <div style="padding:10px;background:var(--surface2);border-radius:10px;border:1px solid var(--border);">
+      <div style="font-size:9px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:3px;">${k}</div>
+      <div style="font-size:11px;font-weight:700;color:var(--text);">${v}</div>
+    </div>`).join('');
+
+  // Abrir sheet
+  const overlay = document.getElementById('week-detail-overlay');
+  overlay.style.display = 'flex';
+  requestAnimationFrame(() => overlay.querySelector('div').style.transform = 'translateY(0)');
+}
+
+function closeWeekDetail() {
+  document.getElementById('week-detail-overlay').style.display = 'none';
 }
 
 // ══════════════════════════════════════════
