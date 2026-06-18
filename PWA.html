@@ -4682,15 +4682,25 @@ function setupManifest() {
 function registerSW() {
   if (!('serviceWorker' in navigator)) return;
   navigator.serviceWorker.register('./service-worker.js').then(reg => {
+    // Forzar activación inmediata del nuevo SW sin esperar cierre de la app
     reg.addEventListener('updatefound', () => {
       const newSW = reg.installing;
       newSW.addEventListener('statechange', () => {
-        if (newSW.state === 'installed' && navigator.serviceWorker.controller) {
-          showToast('Nueva versión disponible — recarga para actualizar');
+        if (newSW.state === 'installed') {
+          newSW.postMessage({ type: 'SKIP_WAITING' });
+        }
+        if (newSW.state === 'activated') {
+          window.location.reload();
         }
       });
     });
+    // Comprobar actualizaciones cada vez que se abre la app
+    reg.update();
   }).catch(() => {});
+  // Recargar cuando el nuevo SW tome el control
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    window.location.reload();
+  });
 }
 
 // ══════════════════════════════════════════
