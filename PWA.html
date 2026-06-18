@@ -4636,7 +4636,12 @@ function showToast(msg) {
 // ══════════════════════════════════════════
 
 let scannedProductData = null;
-let zxingReader = null;
+let scanActive = false;
+let scanStream = null;
+let scanAnimFrame = null;
+let scanCanvas = null;
+let scanCtx = null;
+let zxingDecoder = null;
 
 function loadScript(src) {
   return new Promise((resolve, reject) => {
@@ -4652,98 +4657,161 @@ async function openScanner() {
   overlay.style.display = 'flex';
   overlay.style.flexDirection = 'column';
   document.getElementById('scanner-result').style.display = 'none';
-  document.getElementById('scanner-status').textContent = 'Cargando escáner…';
+  setStatus('Iniciando cámara…');
+  scanActive = false;
 
+  // Step 1: open camera with getUserMedia (works on all iOS/Android)
   try {
-    await loadScript('https://cdn.jsdelivr.net/npm/@zxing/library@0.19.2/umd/index.min.js');
-  } catch {
-    document.getElementById('scanner-status').textContent = 'Sin conexión — introduce el código:';
-    showManualBarcodeInput();
+    scanStream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: 'environment', width: { ideal: 1920 }, height: { ideal: 1080 } },
+      audio: false
+    });
+  } catch (e) {
+    setStatus('🔒 Permite el acceso a la cámara en Ajustes');
     return;
   }
 
+  // Attach stream to video element
+  const viewport = document.getElementById('zxing-viewport');
+  viewport.innerHTML = '';
+  const video = document.createElement('video');
+  video.autoplay = true; video.playsInline = true; video.muted = true;
+  video.style.cssText = 'width:100%;height:100%;object-fit:cover;position:absolute;inset:0;';
+  viewport.appendChild(video);
+  video.srcObject = scanStream;
+  await video.play().catch(() => {});
+
+  setStatus('Cargando detector…');
+
+  // Step 2: load ZXing
+  let decoder = null;
   try {
+    await loadScript('https://cdn.jsdelivr.net/npm/@zxing/library@0.19.2/umd/index.min.js');
     const hints = new Map();
-    const formats = [
-      ZXing.BarcodeFormat.EAN_13,
-      ZXing.BarcodeFormat.EAN_8,
-      ZXing.BarcodeFormat.UPC_A,
-      ZXing.BarcodeFormat.UPC_E,
-      ZXing.BarcodeFormat.CODE_128,
-      ZXing.BarcodeFormat.CODE_39,
-    ];
-    hints.set(ZXing.DecodeHintType.POSSIBLE_FORMATS, formats);
+    hints.set(ZXing.DecodeHintType.POSSIBLE_FORMATS, [
+      ZXing.BarcodeFormat.EAN_13, ZXing.BarcodeFormat.EAN_8,
+      ZXing.BarcodeFormat.UPC_A, ZXing.BarcodeFormat.UPC_E,
+      ZXing.BarcodeFormat.CODE_128, ZXing.BarcodeFormat.CODE_39,
+    ]);
     hints.set(ZXing.DecodeHintType.TRY_HARDER, true);
-
-    zxingReader = new ZXing.BrowserMultiFormatReader(hints, 400);
-
-    // Create video element inside viewport
-    const viewport = document.getElementById('zxing-viewport');
-    viewport.innerHTML = '';
-    const video = document.createElement('video');
-    video.id = 'scanner-video';
-    video.autoplay = true;
-    video.playsInline = true;
-    video.muted = true;
-    video.style.cssText = 'width:100%;height:100%;object-fit:cover;position:absolute;inset:0;';
-    viewport.appendChild(video);
-
-    document.getElementById('scanner-status').textContent = 'Apunta al código de barras';
-
-    await zxingReader.decodeFromConstraints(
-      { video: { facingMode: 'environment' } },
-      video,
-      async (result, err) => {
-        if (result) {
-          stopScanner();
-          if (navigator.vibrate) navigator.vibrate(100);
-          await lookupBarcode(result.getText());
-        }
-        // err is normal when no barcode in frame — ignore
-      }
-    );
-  } catch (err) {
-    const msg = err && err.message ? err.message : '';
-    if (msg.includes('permission') || msg.includes('Permission') || msg.includes('NotAllowed')) {
-      document.getElementById('scanner-status').textContent = '🔒 Permite el acceso a la cámara en Ajustes';
+    decoder = new ZXing.MultiFormatReader();
+    decoder.setHints(hints);
+    zxingDecoder = decoder;
+  } catch {
+    // ZXing failed to load — use BarcodeDetector if available, else manual
+    if ('BarcodeDetector' in window) {
+      decoder = null; // will use BarcodeDetector below
     } else {
-      document.getElementById('scanner-status').textContent = 'Sin cámara — introduce el código:';
+      setStatus('Escáner no disponible. Introduce el código:');
       showManualBarcodeInput();
+      return;
     }
   }
+
+  setStatus('Apunta al código de barras');
+  scanActive = true;
+
+  // Step 3: scan frames via canvas
+  scanCanvas = document.createElement('canvas');
+  scanCtx = scanCanvas.getContext('2d', { willReadFrequently: true });
+
+  let nativeDetector = null;
+  if (!decoder && 'BarcodeDetector' in window) {
+    nativeDetector = new BarcodeDetector({
+      formats: ['ean_13','ean_8','upc_a','upc_e','code_128','code_39']
+    });
+  }
+
+  let lastDetectTime = 0;
+  async function scanFrame() {
+    if (!scanActive) return;
+    const now = Date.now();
+
+    if (video.readyState >= 2 && now - lastDetectTime > 250) {
+      lastDetectTime = now;
+      const w = video.videoWidth; const h = video.videoHeight;
+      if (w && h) {
+        if (nativeDetector) {
+          // BarcodeDetector path (fast, native)
+          try {
+            const codes = await nativeDetector.detect(video);
+            if (codes.length && scanActive) {
+              await onCodeDetected(codes[0].rawValue);
+              return;
+            }
+          } catch {}
+        } else if (decoder) {
+          // ZXing canvas path
+          scanCanvas.width = w; scanCanvas.height = h;
+          scanCtx.drawImage(video, 0, 0, w, h);
+          try {
+            const imageData = scanCtx.getImageData(0, 0, w, h);
+            const luminance = new ZXing.RGBLuminanceSource(imageData.data, w, h);
+            const binary = new ZXing.HybridBinarizer(luminance);
+            const bitmap = new ZXing.BinaryBitmap(binary);
+            const result = decoder.decode(bitmap);
+            if (result && scanActive) {
+              await onCodeDetected(result.getText());
+              return;
+            }
+          } catch {} // NotFoundException is thrown when no barcode — normal
+        }
+      }
+    }
+
+    scanAnimFrame = requestAnimationFrame(scanFrame);
+  }
+
+  scanAnimFrame = requestAnimationFrame(scanFrame);
+}
+
+async function onCodeDetected(code) {
+  scanActive = false;
+  cancelAnimationFrame(scanAnimFrame);
+  if (navigator.vibrate) navigator.vibrate([80]);
+  setStatus('✓ Código detectado');
+  await lookupBarcode(code);
+}
+
+function setStatus(msg) {
+  const el = document.getElementById('scanner-status');
+  if (el) el.textContent = msg;
 }
 
 function closeScanner() {
   stopScanner();
   document.getElementById('scanner-overlay').style.display = 'none';
+  const m = document.getElementById('manual-barcode-input');
+  if (m) m.remove();
 }
 
 function stopScanner() {
-  if (zxingReader) {
-    try { zxingReader.reset(); } catch {}
-    zxingReader = null;
-  }
-  // Stop any lingering camera tracks
-  const vid = document.getElementById('scanner-video');
-  if (vid && vid.srcObject) {
-    vid.srcObject.getTracks().forEach(t => t.stop());
-    vid.srcObject = null;
-  }
+  scanActive = false;
+  cancelAnimationFrame(scanAnimFrame);
+  if (scanStream) { scanStream.getTracks().forEach(t => t.stop()); scanStream = null; }
+  zxingDecoder = null;
 }
 
 function showManualBarcodeInput() {
   const existing = document.getElementById('manual-barcode-input');
-  if (existing) existing.remove();
+  if (existing) { existing.focus(); return; }
+  const wrap = document.createElement('div');
+  wrap.id = 'manual-barcode-input';
+  wrap.style.cssText = 'position:absolute;bottom:calc(var(--safe-b,0px) + 210px);left:16px;right:16px;z-index:20;display:flex;gap:8px;';
   const input = document.createElement('input');
-  input.id = 'manual-barcode-input';
-  input.type = 'tel';
-  input.placeholder = 'Ej: 8410076471058';
-  input.style.cssText = 'position:absolute;bottom:calc(var(--safe-b,0px) + 220px);left:50%;transform:translateX(-50%);width:80%;max-width:260px;background:rgba(255,255,255,0.12);border:1.5px solid rgba(255,255,255,0.3);border-radius:10px;color:#fff;font-size:17px;padding:12px 14px;text-align:center;outline:none;z-index:10;';
-  input.addEventListener('input', async () => {
+  input.type = 'tel'; input.inputMode = 'numeric';
+  input.placeholder = '8410076471058';
+  input.style.cssText = 'flex:1;background:rgba(255,255,255,0.14);border:1.5px solid rgba(255,255,255,0.35);border-radius:10px;color:#fff;font-size:17px;padding:13px 14px;text-align:center;outline:none;';
+  const btn = document.createElement('button');
+  btn.textContent = '→';
+  btn.style.cssText = 'background:var(--accent);border:none;border-radius:10px;color:#fff;font-size:20px;font-weight:700;padding:0 18px;cursor:pointer;';
+  btn.onclick = async () => {
     const v = input.value.replace(/\D/g,'');
-    if (v.length >= 8) { input.blur(); await lookupBarcode(v); }
-  });
-  document.getElementById('scanner-overlay').appendChild(input);
+    if (v.length >= 8) await lookupBarcode(v);
+  };
+  input.addEventListener('keydown', e => { if (e.key === 'Enter') btn.click(); });
+  wrap.appendChild(input); wrap.appendChild(btn);
+  document.getElementById('scanner-overlay').appendChild(wrap);
   setTimeout(() => input.focus(), 200);
 }
 
