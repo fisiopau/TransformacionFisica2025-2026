@@ -1700,20 +1700,36 @@ html.dark select.input { background: var(--surface); }
   <div id="scanner-status" style="position:absolute;bottom:calc(var(--safe-b) + 120px);left:0;right:0;text-align:center;font-size:13px;color:rgba(255,255,255,0.6);">Apunta al código de barras</div>
 
   <!-- Result panel -->
-  <div id="scanner-result" style="display:none;position:absolute;bottom:0;left:0;right:0;padding:16px 16px calc(var(--safe-b) + 16px);background:var(--bg2);border-top:1px solid var(--border);">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
-      <div id="scanner-name" style="font-size:15px;font-weight:700;flex:1;padding-right:8px;"></div>
-      <div style="display:flex;gap:8px;font-size:13px;font-weight:600;">
-        <span id="sc-kcal" style="color:var(--accent);"></span>
-        <span id="sc-p" style="color:var(--blue);"></span>
-        <span id="sc-c" style="color:var(--green);"></span>
-        <span id="sc-f" style="color:var(--muted);"></span>
+  <div id="scanner-result" style="display:none;position:absolute;bottom:0;left:0;right:0;padding:14px 16px calc(var(--safe-b) + 14px);background:#1a1a1a;border-top:1px solid rgba(255,255,255,0.1);">
+    <!-- Veredicto -->
+    <div id="sc-verdict" style="border-radius:10px;padding:10px 14px;margin-bottom:10px;display:none;">
+      <div style="display:flex;align-items:center;gap:8px;">
+        <div id="sc-verdict-icon" style="font-size:22px;flex-shrink:0;"></div>
+        <div>
+          <div id="sc-verdict-title" style="font-size:14px;font-weight:800;font-family:'Barlow Condensed',sans-serif;letter-spacing:0.02em;"></div>
+          <div id="sc-verdict-text" style="font-size:11px;opacity:0.8;margin-top:1px;line-height:1.4;"></div>
+        </div>
+        <div style="margin-left:auto;display:flex;flex-direction:column;align-items:flex-end;gap:3px;">
+          <span id="sc-nutriscore" style="font-size:10px;font-weight:900;padding:2px 7px;border-radius:6px;display:none;"></span>
+          <span id="sc-nova" style="font-size:10px;font-weight:700;padding:2px 7px;border-radius:6px;display:none;"></span>
+        </div>
       </div>
     </div>
-    <div id="scanner-brand" style="font-size:11px;color:var(--muted);margin-bottom:12px;"></div>
+    <!-- Nombre + macros -->
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:2px;">
+      <div id="scanner-name" style="font-size:14px;font-weight:700;flex:1;padding-right:8px;color:#fff;"></div>
+    </div>
+    <div id="scanner-brand" style="font-size:11px;color:rgba(255,255,255,0.45);margin-bottom:8px;"></div>
+    <div style="display:flex;gap:10px;font-size:12px;font-weight:700;margin-bottom:12px;">
+      <span id="sc-kcal" style="color:#F97316;"></span>
+      <span id="sc-p" style="color:#60A5FA;"></span>
+      <span id="sc-c" style="color:#34D399;"></span>
+      <span id="sc-f" style="color:rgba(255,255,255,0.4);"></span>
+      <span id="sc-per" style="color:rgba(255,255,255,0.3);font-weight:400;font-size:11px;align-self:center;"></span>
+    </div>
     <div style="display:flex;gap:8px;">
-      <input type="number" id="sc-qty" value="100" style="width:72px;background:var(--bg3);border:1px solid var(--border);border-radius:8px;color:var(--text);font-size:14px;padding:9px 8px;outline:none;text-align:center;">
-      <span style="align-self:center;font-size:12px;color:var(--muted);">g</span>
+      <input type="number" id="sc-qty" value="100" style="width:72px;background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);border-radius:8px;color:#fff;font-size:14px;padding:9px 8px;outline:none;text-align:center;">
+      <span style="align-self:center;font-size:12px;color:rgba(255,255,255,0.4);">g</span>
       <button onclick="addScannedProduct()" class="btn btn-primary" style="flex:1;">Añadir</button>
     </div>
   </div>
@@ -4686,10 +4702,108 @@ function startBarcodeDetection() {
   }
 }
 
+// ══════════════════════════════════════════
+// EVALUACIÓN DE CALIDAD DE ALIMENTO
+// ══════════════════════════════════════════
+
+function evaluateFoodQuality(nutriments, nutriscoreGrade, novaGroup) {
+  const n = nutriments || {};
+  const kcal  = n['energy-kcal_100g'] || 0;
+  const prot  = n['proteins_100g'] || 0;
+  const fat   = n['fat_100g'] || 0;
+  const satFat= n['saturated-fat_100g'] || 0;
+  const sugar = n['sugars_100g'] || 0;
+  const fiber = n['fiber_100g'] || 0;
+  const salt  = n['salt_100g'] || 0;
+
+  const reasons = [];
+  let score = 0; // higher = better
+
+  // Proteína por kcal (ratio fitness)
+  const protRatio = kcal > 0 ? (prot * 4 / kcal) : 0;
+  if (prot >= 20)        { score += 3; reasons.push('Alta proteína (' + prot.toFixed(1) + 'g/100g)'); }
+  else if (prot >= 12)   { score += 1; reasons.push('Proteína moderada (' + prot.toFixed(1) + 'g/100g)'); }
+  else if (prot < 5 && kcal > 100) { score -= 1; }
+
+  // Azúcar
+  if (sugar > 20)        { score -= 3; reasons.push('Muy alto en azúcar (' + sugar.toFixed(1) + 'g)'); }
+  else if (sugar > 10)   { score -= 1; reasons.push('Azúcar moderado (' + sugar.toFixed(1) + 'g)'); }
+  else if (sugar <= 3)   { score += 1; reasons.push('Bajo en azúcar'); }
+
+  // Grasa saturada
+  if (satFat > 10)       { score -= 2; reasons.push('Alta grasa saturada (' + satFat.toFixed(1) + 'g)'); }
+  else if (satFat <= 2)  { score += 1; }
+
+  // Fibra
+  if (fiber >= 5)        { score += 2; reasons.push('Alta fibra (' + fiber.toFixed(1) + 'g)'); }
+  else if (fiber >= 3)   { score += 1; }
+
+  // Sal
+  if (salt > 2)          { score -= 2; reasons.push('Muy salado (' + salt.toFixed(1) + 'g)'); }
+
+  // NutriScore bonus/penalty
+  const ns = (nutriscoreGrade || '').toLowerCase();
+  if (ns === 'a')        { score += 3; }
+  else if (ns === 'b')   { score += 1; }
+  else if (ns === 'd')   { score -= 2; }
+  else if (ns === 'e')   { score -= 4; }
+
+  // NOVA penalty (ultraprocesados)
+  const nova = parseInt(novaGroup) || 0;
+  if (nova === 4)        { score -= 3; reasons.push('Ultraprocesado (NOVA 4)'); }
+  else if (nova === 3)   { score -= 1; }
+  else if (nova <= 2 && nova > 0) { score += 2; reasons.push('Mínimamente procesado'); }
+
+  // Veredicto final
+  let verdict;
+  if (score >= 4)        verdict = { level: 'great',  icon: '✅', title: 'Excelente para tu objetivo', color: '#16A34A', bg: 'rgba(22,163,74,0.15)', border: 'rgba(22,163,74,0.3)' };
+  else if (score >= 1)   verdict = { level: 'ok',     icon: '👍', title: 'Aceptable con moderación',   color: '#D97706', bg: 'rgba(217,119,6,0.12)',  border: 'rgba(217,119,6,0.3)'  };
+  else if (score >= -1)  verdict = { level: 'caution',icon: '⚠️', title: 'Con precaución',             color: '#EA580C', bg: 'rgba(234,88,12,0.12)',  border: 'rgba(234,88,12,0.3)'  };
+  else                   verdict = { level: 'bad',    icon: '❌', title: 'Evitar en tu plan',           color: '#DC2626', bg: 'rgba(220,38,38,0.12)',  border: 'rgba(220,38,38,0.3)'  };
+
+  // Pick top 2 most relevant reasons
+  const topReasons = reasons.slice(0, 2).join(' · ');
+  return { ...verdict, reasons: topReasons, score, ns, nova };
+}
+
+function renderFoodVerdict(q) {
+  const verdictEl = document.getElementById('sc-verdict');
+  const nsEl      = document.getElementById('sc-nutriscore');
+  const novaEl    = document.getElementById('sc-nova');
+  if (!verdictEl) return;
+
+  verdictEl.style.display = '';
+  verdictEl.style.background = q.bg;
+  verdictEl.style.border = '1.5px solid ' + q.border;
+  document.getElementById('sc-verdict-icon').textContent  = q.icon;
+  document.getElementById('sc-verdict-title').textContent = q.title;
+  document.getElementById('sc-verdict-title').style.color = q.color;
+  document.getElementById('sc-verdict-text').textContent  = q.reasons || '';
+  document.getElementById('sc-verdict-text').style.color  = q.color;
+
+  // NutriScore badge
+  const nsColors = { a:'#1E8F4E', b:'#8BC34A', c:'#F9C74F', d:'#F4831F', e:'#E63946' };
+  if (q.ns) {
+    nsEl.style.display = '';
+    nsEl.textContent = 'NS ' + q.ns.toUpperCase();
+    nsEl.style.background = nsColors[q.ns] || '#666';
+    nsEl.style.color = (q.ns === 'c') ? '#333' : '#fff';
+  } else { nsEl.style.display = 'none'; }
+
+  // NOVA badge
+  if (q.nova) {
+    const novaColors = [,'#1E8F4E','#8BC34A','#F9C74F','#E63946'];
+    novaEl.style.display = '';
+    novaEl.textContent = 'NOVA ' + q.nova;
+    novaEl.style.background = novaColors[q.nova] || '#666';
+    novaEl.style.color = (q.nova === 3) ? '#333' : '#fff';
+  } else { novaEl.style.display = 'none'; }
+}
+
 async function lookupBarcode(code) {
   document.getElementById('scanner-status').textContent = '🔍 Buscando ' + code + '…';
   try {
-    const res = await fetch(`https://world.openfoodfacts.org/api/v2/product/${code}.json?fields=product_name,brands,image_front_small_url,nutriments,product_quantity,serving_size`);
+    const res = await fetch(`https://world.openfoodfacts.org/api/v2/product/${code}.json?fields=product_name,brands,image_front_small_url,nutriments,nutriscore_grade,nova_group,product_quantity,serving_size`);
     const data = await res.json();
 
     if (data.status !== 1 || !data.product) {
@@ -4703,23 +4817,33 @@ async function lookupBarcode(code) {
 
     const p = data.product;
     const n = p.nutriments || {};
-    // Values per 100g
     const kcal100 = Math.round(n['energy-kcal_100g'] || n['energy-kcal'] || 0);
     const prot100  = parseFloat((n['proteins_100g'] || 0).toFixed(1));
     const carb100  = parseFloat((n['carbohydrates_100g'] || 0).toFixed(1));
     const fat100   = parseFloat((n['fat_100g'] || 0).toFixed(1));
 
-    scannedProductData = { name: p.product_name || 'Producto', brand: p.brands || '', img: p.image_front_small_url || '', kcal100, prot100, carb100, fat100 };
+    scannedProductData = {
+      name: p.product_name || 'Producto',
+      brand: p.brands || '',
+      img: p.image_front_small_url || '',
+      kcal100, prot100, carb100, fat100
+    };
 
     document.getElementById('scanner-name').textContent  = scannedProductData.name;
     document.getElementById('scanner-brand').textContent = scannedProductData.brand;
-    document.getElementById('scanner-img').src           = scannedProductData.img;
+    const imgEl = document.getElementById('scanner-img');
+    if (imgEl) imgEl.src = scannedProductData.img;
     document.getElementById('sc-kcal').textContent = kcal100 + ' kcal';
     document.getElementById('sc-p').textContent    = 'P ' + prot100 + 'g';
     document.getElementById('sc-c').textContent    = 'C ' + carb100 + 'g';
     document.getElementById('sc-f').textContent    = 'F ' + fat100 + 'g';
     document.getElementById('sc-per').textContent  = 'por 100g';
     document.getElementById('sc-qty').value        = 100;
+
+    // Evaluate and show food quality verdict
+    const quality = evaluateFoodQuality(n, p.nutriscore_grade, p.nova_group);
+    renderFoodVerdict(quality);
+
     document.getElementById('scanner-result').style.display = 'block';
     document.getElementById('scanner-status').textContent = '✓ Producto encontrado';
 
