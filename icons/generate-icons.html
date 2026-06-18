@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Generar iconos PWA</title>
+<style>
+  body { font-family: system-ui; background: #111; color: #eee; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; gap: 20px; }
+  canvas { border-radius: 20%; box-shadow: 0 8px 32px rgba(0,0,0,0.5); }
+  button { background: #F97316; color: white; border: none; padding: 14px 28px; border-radius: 10px; font-size: 16px; font-weight: 700; cursor: pointer; }
+  button:hover { background: #EA580C; }
+  .row { display: flex; gap: 32px; align-items: flex-end; }
+  p { color: #aaa; font-size: 14px; text-align: center; max-width: 400px; }
+</style>
+</head>
+<body>
+<h2>🏋️ Generador de Iconos PWA</h2>
+<p>Haz clic en "Descargar iconos" y guarda los dos PNG en la carpeta <code>icons/</code></p>
+
+<div class="row">
+  <div style="text-align:center">
+    <canvas id="c192" width="192" height="192"></canvas>
+    <div style="margin-top:8px;font-size:12px;color:#aaa">192×192</div>
+  </div>
+  <div style="text-align:center">
+    <canvas id="c512" width="512" height="512"></canvas>
+    <div style="margin-top:8px;font-size:12px;color:#aaa">512×512</div>
+  </div>
+</div>
+
+<button onclick="downloadAll()">⬇️ Descargar icon-192.png e icon-512.png</button>
+<p style="color:#666">Después de descargar, mueve ambos PNG a la carpeta <code>icons/</code> junto a este archivo.</p>
+
+<script>
+function drawIcon(canvas) {
+  const S = canvas.width;
+  const ctx = canvas.getContext('2d');
+  const r = S * 0.22; // corner radius
+
+  // Background rounded rect
+  ctx.beginPath();
+  ctx.moveTo(r, 0);
+  ctx.lineTo(S - r, 0);
+  ctx.quadraticCurveTo(S, 0, S, r);
+  ctx.lineTo(S, S - r);
+  ctx.quadraticCurveTo(S, S, S - r, S);
+  ctx.lineTo(r, S);
+  ctx.quadraticCurveTo(0, S, 0, S - r);
+  ctx.lineTo(0, r);
+  ctx.quadraticCurveTo(0, 0, r, 0);
+  ctx.closePath();
+
+  const grad = ctx.createRadialGradient(S * 0.5, S * 0.25, 0, S * 0.5, S * 0.5, S * 0.7);
+  grad.addColorStop(0, '#FB923C');
+  grad.addColorStop(1, '#EA580C');
+  ctx.fillStyle = grad;
+  ctx.fill();
+
+  // Dumbbell
+  const cx = S / 2;
+  const cy = S * 0.42;
+  const barW = S * 0.6;
+  const barH = S * 0.065;
+  const plateW = S * 0.085;
+  const plateH = S * 0.24;
+  const plateX = cx - barW / 2 - plateW;
+  const plateY = cy - plateH / 2;
+
+  ctx.fillStyle = 'rgba(255,255,255,0.95)';
+
+  // Bar
+  roundRect(ctx, cx - barW / 2, cy - barH / 2, barW, barH, barH / 2);
+  ctx.fill();
+
+  // Left plate outer
+  ctx.fillStyle = 'rgba(255,255,255,0.4)';
+  roundRect(ctx, plateX - S * 0.02, cy - plateH / 2 - S * 0.02, plateW * 0.8, plateH + S * 0.04, S * 0.015);
+  ctx.fill();
+
+  // Left plate inner
+  ctx.fillStyle = 'rgba(255,255,255,0.9)';
+  roundRect(ctx, plateX, cy - plateH / 2, plateW * 0.7, plateH, S * 0.012);
+  ctx.fill();
+
+  // Right plate outer
+  const rPlateX = cx + barW / 2 + S * 0.005;
+  ctx.fillStyle = 'rgba(255,255,255,0.4)';
+  roundRect(ctx, rPlateX + S * 0.005, cy - plateH / 2 - S * 0.02, plateW * 0.8, plateH + S * 0.04, S * 0.015);
+  ctx.fill();
+
+  // Right plate inner
+  ctx.fillStyle = 'rgba(255,255,255,0.9)';
+  roundRect(ctx, rPlateX + S * 0.015, cy - plateH / 2, plateW * 0.7, plateH, S * 0.012);
+  ctx.fill();
+
+  // "TF" text
+  ctx.fillStyle = 'rgba(255,255,255,0.95)';
+  ctx.font = `900 ${S * 0.19}px system-ui, -apple-system, sans-serif`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.letterSpacing = `${S * 0.01}px`;
+  ctx.fillText('TF', cx, S * 0.78);
+}
+
+function roundRect(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + w - r, y);
+  ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+  ctx.lineTo(x + w, y + h - r);
+  ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+  ctx.lineTo(x + r, y + h);
+  ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+  ctx.lineTo(x, y + r);
+  ctx.quadraticCurveTo(x, y, x + r, y);
+  ctx.closePath();
+}
+
+function downloadCanvas(canvas, filename) {
+  const a = document.createElement('a');
+  a.download = filename;
+  a.href = canvas.toDataURL('image/png');
+  a.click();
+}
+
+function downloadAll() {
+  downloadCanvas(document.getElementById('c192'), 'icon-192.png');
+  setTimeout(() => downloadCanvas(document.getElementById('c512'), 'icon-512.png'), 300);
+}
+
+// Draw on load
+drawIcon(document.getElementById('c192'));
+drawIcon(document.getElementById('c512'));
+</script>
+</body>
+</html>
