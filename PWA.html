@@ -4683,10 +4683,11 @@ function stopScanner() {
     scannerStream.getTracks().forEach(t => t.stop());
     scannerStream = null;
   }
-  if (quaggaActive && window.Quagga) {
-    try { Quagga.stop(); } catch {}
-    quaggaActive = false;
+  if (html5QrScanner) {
+    try { html5QrScanner.stop(); } catch {}
+    html5QrScanner = null;
   }
+  quaggaActive = false;
 }
 
 // ── Native BarcodeDetector (Chrome Android, Safari iOS 17+ PWA) ──
@@ -4707,70 +4708,67 @@ function startNativeDetection() {
   }, 400);
 }
 
-// ── QuaggaJS fallback (iOS Safari, older Android, any browser) ──
+// ── html5-qrcode fallback (iOS Safari, Android, cualquier navegador) ──
+let html5QrScanner = null;
+
 function startQuaggaScanner() {
   document.getElementById('scanner-status').textContent = 'Cargando escáner…';
 
-  function initQuagga() {
+  function initHtml5Qr() {
     const viewport = document.getElementById('quagga-viewport');
-    Quagga.init({
-      inputStream: {
-        name: 'Live',
-        type: 'LiveStream',
-        target: viewport,
-        constraints: { facingMode: 'environment', width: { ideal: 1280 }, height: { ideal: 720 } }
-      },
-      locator: { patchSize: 'medium', halfSample: true },
-      numOfWorkers: 0,
-      frequency: 8,
-      decoder: { readers: ['ean_reader','ean_8_reader','upc_reader','upc_e_reader','code_128_reader'] },
-      locate: true
-    }, err => {
-      if (err) {
-        console.warn('Quagga init error:', err);
-        showManualBarcodeInput();
-        return;
-      }
-      Quagga.start();
-      quaggaActive = true;
-      // Style the quagga video to fill the viewport
-      const qVideo = viewport.querySelector('video');
-      if (qVideo) {
-        qVideo.style.cssText = 'width:100%;height:100%;object-fit:cover;position:absolute;inset:0;';
-      }
-      // Hide quagga canvas overlay (we use our own UI)
-      const qCanvas = viewport.querySelector('canvas');
-      if (qCanvas) qCanvas.style.display = 'none';
-      document.getElementById('scanner-status').textContent = 'Apunta al código de barras';
-    });
+    viewport.innerHTML = ''; // clear
 
-    let lastCode = null;
-    let lastTime = 0;
-    Quagga.onDetected(async result => {
-      const code = result.codeResult.code;
-      const now = Date.now();
-      // Debounce: same code must appear twice within 1s
-      if (code === lastCode && now - lastTime < 1500) {
-        try { Quagga.stop(); } catch {}
+    html5QrScanner = new Html5Qrcode('quagga-viewport', { verbose: false });
+
+    const config = {
+      fps: 10,
+      qrbox: { width: 280, height: 120 },
+      formatsToSupport: [
+        Html5QrcodeSupportedFormats.EAN_13,
+        Html5QrcodeSupportedFormats.EAN_8,
+        Html5QrcodeSupportedFormats.UPC_A,
+        Html5QrcodeSupportedFormats.UPC_E,
+        Html5QrcodeSupportedFormats.CODE_128,
+        Html5QrcodeSupportedFormats.CODE_39,
+      ],
+      aspectRatio: window.innerHeight / window.innerWidth
+    };
+
+    html5QrScanner.start(
+      { facingMode: 'environment' },
+      config,
+      async (code) => {
+        // Success
+        try { await html5QrScanner.stop(); } catch {}
+        html5QrScanner = null;
         quaggaActive = false;
         if (navigator.vibrate) navigator.vibrate(100);
         await lookupBarcode(code);
-        lastCode = null;
-      } else {
-        lastCode = code;
-        lastTime = now;
-      }
+      },
+      () => {} // scan errors are normal while scanning, ignore
+    ).then(() => {
+      quaggaActive = true;
+      document.getElementById('scanner-status').textContent = 'Apunta al código de barras';
+      // Make the html5-qrcode video fill the container
+      const vid = viewport.querySelector('video');
+      if (vid) vid.style.cssText = 'width:100%!important;height:100%!important;object-fit:cover!important;';
+      // Hide the built-in scan region overlay (we have our own)
+      const region = viewport.querySelector('#qr-shaded-region');
+      if (region) region.style.display = 'none';
+    }).catch(err => {
+      console.warn('html5-qrcode error:', err);
+      showManualBarcodeInput();
     });
   }
 
-  if (window.Quagga) {
-    initQuagga();
+  if (window.Html5Qrcode) {
+    initHtml5Qr();
     return;
   }
 
   const script = document.createElement('script');
-  script.src = 'https://cdn.jsdelivr.net/npm/quagga@0.12.1/dist/quagga.min.js';
-  script.onload = initQuagga;
+  script.src = 'https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js';
+  script.onload = initHtml5Qr;
   script.onerror = showManualBarcodeInput;
   document.head.appendChild(script);
 }
