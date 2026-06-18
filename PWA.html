@@ -812,8 +812,8 @@ html.dark select.input { background: var(--surface); }
   <!-- Biométricos rápidos -->
   <div class="section-title">Biométricos Rápidos</div>
   <div class="card" style="margin:0 16px;">
-    <!-- Apple Health sync banner -->
-    <div id="health-sync-banner" style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid var(--border);gap:10px;">
+    <!-- Apple Health sync banner — iOS only -->
+    <div id="health-sync-banner" style="display:none;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid var(--border);gap:10px;">
       <div style="display:flex;align-items:center;gap:8px;flex:1;min-width:0;">
         <!-- Apple Health heart icon -->
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" style="flex-shrink:0;">
@@ -913,19 +913,31 @@ html.dark select.input { background: var(--surface); }
       <div>
         <div style="font-size:10px;color:var(--muted);margin-bottom:4px;">Energía</div>
         <div style="display:flex;gap:3px;" id="rate-energia">
-          ${[1,2,3,4,5].map(n=>`<button onclick="setRating('energia',${n})" id="re-${n}" style="flex:1;height:24px;border-radius:4px;border:1px solid var(--border);background:var(--surface2);font-size:10px;font-weight:700;cursor:pointer;color:var(--muted);">${n}</button>`).join('')}
+          <button onclick="setRating('energia',1)" id="re-1" style="flex:1;height:24px;border-radius:4px;border:1px solid var(--border);background:var(--surface2);font-size:10px;font-weight:700;cursor:pointer;color:var(--muted);">1</button>
+          <button onclick="setRating('energia',2)" id="re-2" style="flex:1;height:24px;border-radius:4px;border:1px solid var(--border);background:var(--surface2);font-size:10px;font-weight:700;cursor:pointer;color:var(--muted);">2</button>
+          <button onclick="setRating('energia',3)" id="re-3" style="flex:1;height:24px;border-radius:4px;border:1px solid var(--border);background:var(--surface2);font-size:10px;font-weight:700;cursor:pointer;color:var(--muted);">3</button>
+          <button onclick="setRating('energia',4)" id="re-4" style="flex:1;height:24px;border-radius:4px;border:1px solid var(--border);background:var(--surface2);font-size:10px;font-weight:700;cursor:pointer;color:var(--muted);">4</button>
+          <button onclick="setRating('energia',5)" id="re-5" style="flex:1;height:24px;border-radius:4px;border:1px solid var(--border);background:var(--surface2);font-size:10px;font-weight:700;cursor:pointer;color:var(--muted);">5</button>
         </div>
       </div>
       <div>
         <div style="font-size:10px;color:var(--muted);margin-bottom:4px;">Recuperación</div>
         <div style="display:flex;gap:3px;" id="rate-recuperacion">
-          ${[1,2,3,4,5].map(n=>`<button onclick="setRating('recuperacion',${n})" id="rr-${n}" style="flex:1;height:24px;border-radius:4px;border:1px solid var(--border);background:var(--surface2);font-size:10px;font-weight:700;cursor:pointer;color:var(--muted);">${n}</button>`).join('')}
+          <button onclick="setRating('recuperacion',1)" id="rr-1" style="flex:1;height:24px;border-radius:4px;border:1px solid var(--border);background:var(--surface2);font-size:10px;font-weight:700;cursor:pointer;color:var(--muted);">1</button>
+          <button onclick="setRating('recuperacion',2)" id="rr-2" style="flex:1;height:24px;border-radius:4px;border:1px solid var(--border);background:var(--surface2);font-size:10px;font-weight:700;cursor:pointer;color:var(--muted);">2</button>
+          <button onclick="setRating('recuperacion',3)" id="rr-3" style="flex:1;height:24px;border-radius:4px;border:1px solid var(--border);background:var(--surface2);font-size:10px;font-weight:700;cursor:pointer;color:var(--muted);">3</button>
+          <button onclick="setRating('recuperacion',4)" id="rr-4" style="flex:1;height:24px;border-radius:4px;border:1px solid var(--border);background:var(--surface2);font-size:10px;font-weight:700;cursor:pointer;color:var(--muted);">4</button>
+          <button onclick="setRating('recuperacion',5)" id="rr-5" style="flex:1;height:24px;border-radius:4px;border:1px solid var(--border);background:var(--surface2);font-size:10px;font-weight:700;cursor:pointer;color:var(--muted);">5</button>
         </div>
       </div>
       <div>
         <div style="font-size:10px;color:var(--muted);margin-bottom:4px;">Motivación</div>
         <div style="display:flex;gap:3px;" id="rate-motivacion">
-          ${[1,2,3,4,5].map(n=>`<button onclick="setRating('motivacion',${n})" id="rm-${n}" style="flex:1;height:24px;border-radius:4px;border:1px solid var(--border);background:var(--surface2);font-size:10px;font-weight:700;cursor:pointer;color:var(--muted);">${n}</button>`).join('')}
+          <button onclick="setRating('motivacion',1)" id="rm-1" style="flex:1;height:24px;border-radius:4px;border:1px solid var(--border);background:var(--surface2);font-size:10px;font-weight:700;cursor:pointer;color:var(--muted);">1</button>
+          <button onclick="setRating('motivacion',2)" id="rm-2" style="flex:1;height:24px;border-radius:4px;border:1px solid var(--border);background:var(--surface2);font-size:10px;font-weight:700;cursor:pointer;color:var(--muted);">2</button>
+          <button onclick="setRating('motivacion',3)" id="rm-3" style="flex:1;height:24px;border-radius:4px;border:1px solid var(--border);background:var(--surface2);font-size:10px;font-weight:700;cursor:pointer;color:var(--muted);">3</button>
+          <button onclick="setRating('motivacion',4)" id="rm-4" style="flex:1;height:24px;border-radius:4px;border:1px solid var(--border);background:var(--surface2);font-size:10px;font-weight:700;cursor:pointer;color:var(--muted);">4</button>
+          <button onclick="setRating('motivacion',5)" id="rm-5" style="flex:1;height:24px;border-radius:4px;border:1px solid var(--border);background:var(--surface2);font-size:10px;font-weight:700;cursor:pointer;color:var(--muted);">5</button>
         </div>
       </div>
     </div>
@@ -5472,6 +5484,12 @@ document.addEventListener('DOMContentLoaded', () => {
   migratePhotosToIDB();
   checkIOSInstallBanner();
 
+  // Show Apple Health banner only on iOS
+  if (/iPhone|iPad/.test(navigator.userAgent)) {
+    const banner = document.getElementById('health-sync-banner');
+    if (banner) banner.style.display = 'flex';
+  }
+
   // Seed biométricos de evaluación inicial si el array está vacío
   if (!getBio().length) {
     addBio({ fecha: '2025-06-15', peso: 74.65, grasa: 16.9, hrv: 39, fc: null, sueno: null, _seed: true });
@@ -5531,8 +5549,15 @@ async function syncAppleHealth() {
 
   // Must be on iOS Safari with HealthKit Web API (iOS 17.4+, installed as PWA)
   if (typeof Health === 'undefined') {
-    showToast('Requiere iPhone con iOS 17.4+ instalado como app');
-    if (statusEl) statusEl.textContent = 'No disponible en este dispositivo';
+    const isIOS = /iPhone|iPad/.test(navigator.userAgent);
+    const isStandaloneIOS = window.navigator.standalone;
+    if (isIOS && !isStandaloneIOS) {
+      showToast('Abre desde la app instalada (icono en pantalla inicio) para sincronizar con Salud');
+    } else if (isIOS) {
+      showToast('Requiere iOS 17.4 o superior');
+    }
+    // On non-iOS just silently mark unavailable
+    if (statusEl) statusEl.textContent = 'No disponible';
     return;
   }
 
