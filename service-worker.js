@@ -1,7 +1,7 @@
 // TransFísica PWA — Service Worker
 // Estrategia: Cache-First para assets, Network-First para datos externos
 
-const CACHE_NAME = 'transfisica-v10';
+const CACHE_NAME = 'transfisica-v11';
 const STATIC_ASSETS = [
   './PWA.html',
   './manifest.json',
