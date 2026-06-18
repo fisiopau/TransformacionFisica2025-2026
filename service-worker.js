@@ -1,7 +1,7 @@
 // TransFísica PWA — Service Worker
 // Estrategia: Cache-First para assets, Network-First para datos externos
 
-const CACHE_NAME = 'transfisica-v3';
+const CACHE_NAME = 'transfisica-v4';
 const STATIC_ASSETS = [
   './PWA.html',
   './manifest.json',
@@ -73,24 +73,27 @@ self.addEventListener('fetch', event => {
     return;
   }
 
-  // Assets locales + Google Fonts → Cache-first
-  event.respondWith(
-    caches.match(request).then(cached => {
-      if (cached) return cached;
-
-      return fetch(request).then(response => {
-        // Solo cachear respuestas válidas
-        if (!response || response.status !== 200 || response.type === 'error') {
-          return response;
-        }
+  // HTML principal → Network-first (siempre intenta red, cache solo si offline)
+  if (request.destination === 'document' || request.url.endsWith('PWA.html')) {
+    event.respondWith(
+      fetch(request).then(response => {
         const clone = response.clone();
         caches.open(CACHE_NAME).then(cache => cache.put(request, clone));
         return response;
-      }).catch(() => {
-        // Offline fallback: si piden el HTML principal, servir desde cache
-        if (request.destination === 'document') {
-          return caches.match('./PWA.html');
-        }
+      }).catch(() => caches.match(request))
+    );
+    return;
+  }
+
+  // Resto de assets (iconos, fuentes) → Cache-first
+  event.respondWith(
+    caches.match(request).then(cached => {
+      if (cached) return cached;
+      return fetch(request).then(response => {
+        if (!response || response.status !== 200 || response.type === 'error') return response;
+        const clone = response.clone();
+        caches.open(CACHE_NAME).then(cache => cache.put(request, clone));
+        return response;
       });
     })
   );
