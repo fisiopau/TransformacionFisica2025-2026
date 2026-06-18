@@ -2115,61 +2115,197 @@ const PROGRAMS = {
 
 // 7-day meal plan
 const MEALS_WEEK = [
+  // ─────────────────────────────────────────────────────────────────────
+  // LUNES — Push A (Pecho · Tríceps) · Entreno 20:15
+  // Target F1: 2450 kcal · 170g P · 250g C · 85g F
+  // ─────────────────────────────────────────────────────────────────────
   { dia: 'Lunes', meals: [
-    { hora:'06:00', nombre:'Desayuno',              kcal:490, p:40, c:52, f:12, items:'3 huevos enteros · 70g avena · 1 plátano' },
-    { hora:'09:30', nombre:'Snack mañana',           kcal:298, p:33, c:24, f:7,  items:'2 latas atún (160g) · 30g arroz crackers · pepino' },
-    { hora:'13:30', nombre:'Comida (tupper)',         kcal:694, p:48, c:72, f:15, items:'200g pechuga pollo · 180g arroz cocido · 200g brócoli · AOVE' },
-    { hora:'17:30', nombre:'Merienda',               kcal:476, p:32, c:56, f:14, items:'30g mantequilla cacahuete · 2 tostadas integrales · 1 plátano' },
-    { hora:'20:15', nombre:'Pre-entreno',            kcal:217, p:22, c:30, f:3,  items:'80g arroz crackers · 30g proteína whey con agua' },
-    { hora:'21:45', nombre:'Cena post-entreno',      kcal:620, p:52, c:48, f:18, items:'200g salmón · 300g boniato · espinacas · AOVE' },
+    { hora:'06:30', nombre:'Desayuno',
+      kcal:510, p:33, c:55, f:15,
+      items:'3 huevos revueltos con espinacas · 60g avena con canela · 1 plátano mediano',
+      nota:'Proteína completa desde primera hora. Avena = HC lento para energía estable toda la mañana. Sin azúcar añadido.' },
+    { hora:'10:00', nombre:'Snack — RÁPIDO ⚡',
+      kcal:255, p:36, c:16, f:4,
+      items:'200g yogur griego 0% + 25g proteína whey mezclado · 1 manzana',
+      nota:'36g proteína en 2 minutos. Mantiene síntesis proteica activa entre desayuno y comida.' },
+    { hora:'13:30', nombre:'Comida (tupper)',
+      kcal:695, p:50, c:70, f:16,
+      items:'180g pechuga pollo a la plancha · 200g arroz blanco cocido · 200g brócoli al vapor · 15ml AOVE',
+      nota:'Mayor comida del día. Arroz blanco = digestión más rápida que integral (mejor para absorber proteína).' },
+    { hora:'18:30', nombre:'Pre-entreno 🔋',
+      kcal:340, p:27, c:54, f:3,
+      items:'25g whey en agua · 1 plátano grande · 80g arroz blanco cocido (frío o caliente)',
+      nota:'90 min antes del entreno. Sin grasa ni fibra alta (ralentizan digestión). HC rápidos = glucógeno cargado antes de levantar.' },
+    { hora:'22:00', nombre:'Post-entreno + Cena 💪',
+      kcal:650, p:50, c:55, f:18,
+      items:'[Al llegar: 30g whey + 150ml leche] · 200g salmón al horno · 200g boniato asado · 150g espinacas salteadas · 10ml AOVE',
+      nota:'Whey inmediato al llegar = ventana anabólica. Salmón = proteína lenta + omega-3 antiinflamatorio para recuperación nocturna.' },
   ]},
+
+  // ─────────────────────────────────────────────────────────────────────
+  // MARTES — Pull A (Dorsal · Bíceps) · Entreno 20:15
+  // ─────────────────────────────────────────────────────────────────────
   { dia: 'Martes', meals: [
-    { hora:'06:00', nombre:'Desayuno',              kcal:490, p:40, c:52, f:12, items:'3 huevos + 2 claras · 60g avena · mermelada sin azúcar' },
-    { hora:'09:30', nombre:'Snack mañana',           kcal:290, p:32, c:22, f:8,  items:'200g queso cottage · 30g arroz crackers · 1 manzana' },
-    { hora:'13:30', nombre:'Comida (tupper)',         kcal:700, p:50, c:70, f:14, items:'200g pechuga pavo · 160g arroz · 200g judías verdes · AOVE' },
-    { hora:'17:30', nombre:'Merienda',               kcal:460, p:30, c:58, f:12, items:'2 tostadas integrales · 40g queso fresco · 1 pera · frutos secos 15g' },
-    { hora:'20:15', nombre:'Pre-entreno',            kcal:215, p:22, c:28, f:4,  items:'1 plátano · 30g whey' },
-    { hora:'21:45', nombre:'Cena post-entreno',      kcal:610, p:50, c:50, f:16, items:'200g merluza al horno · 250g boniato · espárragos · AOVE' },
+    { hora:'06:30', nombre:'Desayuno',
+      kcal:505, p:34, c:53, f:14,
+      items:'3 huevos + 1 clara revueltos · 60g avena · 100g arándanos o fresas',
+      nota:'Variación de frutas para micronutrientes distintos. Los arándanos tienen antioxidantes que reducen daño muscular post-entreno.' },
+    { hora:'10:00', nombre:'Snack — RÁPIDO ⚡',
+      kcal:245, p:30, c:20, f:5,
+      items:'150g queso cottage 0% · 25g whey mezclado · 1 pera',
+      nota:'Queso cottage = caseína (digestión lenta) + whey (rápida). Combinación ideal para mantener MPS entre comidas.' },
+    { hora:'13:30', nombre:'Comida (tupper)',
+      kcal:700, p:50, c:72, f:15,
+      items:'200g pechuga pavo a la plancha · 180g arroz cocido · 200g judías verdes salteadas · 15ml AOVE',
+      nota:'Pavo = proteína muy magra. Permite poner algo más de AOVE para llegar al objetivo de grasas.' },
+    { hora:'18:30', nombre:'Pre-entreno 🔋',
+      kcal:335, p:26, c:53, f:4,
+      items:'25g whey en agua · 1 plátano grande · 2 dátiles Medjool',
+      nota:'Dátiles = HC de índice glucémico muy alto → glucógeno inmediato. Fáciles de llevar. Sin preparación.' },
+    { hora:'22:00', nombre:'Post-entreno + Cena 💪',
+      kcal:665, p:52, c:52, f:19,
+      items:'[Al llegar: 30g whey + 1 plátano pequeño] · 200g merluza al horno · 250g boniato · 150g espárragos · 10ml AOVE',
+      nota:'Merluza = proteína muy magra y de fácil digestión nocturna. Boniato repone glucógeno muscular durante el sueño.' },
   ]},
+
+  // ─────────────────────────────────────────────────────────────────────
+  // MIÉRCOLES — Legs A (Cuáds · Isquios) · Entreno 20:15
+  // ─────────────────────────────────────────────────────────────────────
   { dia: 'Miércoles', meals: [
-    { hora:'06:00', nombre:'Desayuno',              kcal:495, p:41, c:50, f:13, items:'Tortilla 3 huevos + espinacas · 60g avena · 1 naranja' },
-    { hora:'09:30', nombre:'Snack mañana',           kcal:285, p:30, c:25, f:8,  items:'150g yogur griego 0% · 30g proteína whey · 1 plátano' },
-    { hora:'13:30', nombre:'Comida (tupper)',         kcal:688, p:47, c:74, f:14, items:'180g solomillo ternera · 160g arroz · pimiento salteado · AOVE' },
-    { hora:'17:30', nombre:'Merienda',               kcal:470, p:31, c:57, f:13, items:'Tostadas · 1 lata atún · aguacate 50g · tomate cherry' },
-    { hora:'20:15', nombre:'Pre-entreno',            kcal:210, p:20, c:32, f:3,  items:'80g arroz crackers · 25g whey · plátano pequeño' },
-    { hora:'21:45', nombre:'Cena post-entreno',      kcal:625, p:53, c:46, f:17, items:'180g bacalao + 100g gambas · 250g boniato · brócoli' },
+    { hora:'06:30', nombre:'Desayuno',
+      kcal:520, p:35, c:56, f:14,
+      items:'3 huevos revueltos · 70g avena con canela · 1 plátano mediano',
+      nota:'Más carbohidratos en desayuno de día de piernas. Las sentadillas y peso muerto consumen más glucógeno.' },
+    { hora:'10:00', nombre:'Snack — RÁPIDO ⚡',
+      kcal:250, p:34, c:15, f:5,
+      items:'200g yogur griego 0% + 25g whey · puñado de arándanos (80g)',
+      nota:'Simple y rápido. No necesitas nada más a media mañana si el desayuno fue completo.' },
+    { hora:'13:30', nombre:'Comida (tupper)',
+      kcal:705, p:48, c:75, f:16,
+      items:'180g solomillo ternera a la plancha · 200g arroz cocido · 150g pimiento rojo salteado · 15ml AOVE',
+      nota:'Ternera = creatina natural + hierro + zinc → recuperación muscular y testosterona. Carbos altos = glucógeno para entreno de piernas.' },
+    { hora:'18:30', nombre:'Pre-entreno 🔋',
+      kcal:340, p:26, c:55, f:4,
+      items:'25g whey en agua · 1 plátano grande · 80g arroz blanco cocido',
+      nota:'Legs = sesión más demandante energéticamente. Carga completa de glucógeno 90 min antes.' },
+    { hora:'22:00', nombre:'Post-entreno + Cena 💪',
+      kcal:635, p:50, c:49, f:18,
+      items:'[Al llegar: 30g whey + 1 plátano] · 200g bacalao al horno · 200g boniato · 200g brócoli · 10ml AOVE',
+      nota:'Post-piernas: máxima prioridad a proteína rápida. El boniato repone glucógeno de forma sostenida.' },
   ]},
+
+  // ─────────────────────────────────────────────────────────────────────
+  // JUEVES — Push B + HIIT (Hombros · Tríceps) · Entreno 20:15
+  // ─────────────────────────────────────────────────────────────────────
   { dia: 'Jueves', meals: [
-    { hora:'06:00', nombre:'Desayuno',              kcal:488, p:39, c:53, f:11, items:'3 huevos revueltos · 70g avena con miel · 1 kiwi' },
-    { hora:'09:30', nombre:'Snack mañana',           kcal:295, p:34, c:23, f:7,  items:'2 latas atún · 30g avena crackers · pepinillos' },
-    { hora:'13:30', nombre:'Comida (tupper)',         kcal:695, p:49, c:71, f:15, items:'200g pollo asado · 180g arroz integral · 200g espinacas · AOVE' },
-    { hora:'17:30', nombre:'Merienda',               kcal:465, p:32, c:54, f:14, items:'Tortitas de arroz × 6 · 40g mantequilla almendra · 1 plátano' },
-    { hora:'20:15', nombre:'Pre-entreno',            kcal:218, p:23, c:29, f:3,  items:'30g whey · 80g rice crackers' },
-    { hora:'21:45', nombre:'Cena post-entreno',      kcal:615, p:51, c:49, f:17, items:'200g panga al horno · 300g patata · judías verdes · AOVE' },
+    { hora:'06:30', nombre:'Desayuno',
+      kcal:505, p:32, c:55, f:14,
+      items:'2 huevos + 2 claras revueltos · 60g avena · 1 plátano mediano',
+      nota:'Mismo patrón consistente. La consistencia en desayuno facilita el hábito y simplifica la preparación.' },
+    { hora:'10:00', nombre:'Snack — RÁPIDO ⚡',
+      kcal:260, p:33, c:20, f:5,
+      items:'2 latas de atún en agua (160g escurrido) · 1 manzana',
+      nota:'33g proteína de máxima calidad sin preparación. El atún tiene todos los aminoácidos esenciales. Cómelo con un tenedor de la lata.' },
+    { hora:'13:30', nombre:'Comida (tupper)',
+      kcal:690, p:50, c:70, f:15,
+      items:'180g pechuga pollo · 200g arroz cocido · 200g espinacas salteadas · 15ml AOVE',
+      nota:'Espinacas = magnesio y nitratos que mejoran rendimiento en hombros y tríceps. Mayor vasodilatación.' },
+    { hora:'18:30', nombre:'Pre-entreno 🔋',
+      kcal:335, p:25, c:54, f:4,
+      items:'25g whey en agua · 1 plátano grande · 2 dátiles',
+      nota:'Sesión Push B + HIIT = alta demanda. Sin complicaciones: whey + azúcar rápido del plátano y dátiles.' },
+    { hora:'22:00', nombre:'Post-entreno + Cena 💪',
+      kcal:660, p:50, c:51, f:19,
+      items:'[Al llegar: 30g whey + 1 plátano] · 200g salmón a la plancha · 200g patata cocida · espárragos · 10ml AOVE',
+      nota:'Jueves post-HIIT: omega-3 del salmón son antiinflamatorios prioritarios. Patata en lugar de boniato para variar.' },
   ]},
+
+  // ─────────────────────────────────────────────────────────────────────
+  // VIERNES — Pull B (Dorsal · Bíceps) · Entreno 20:15
+  // ─────────────────────────────────────────────────────────────────────
   { dia: 'Viernes', meals: [
-    { hora:'06:00', nombre:'Desayuno',              kcal:492, p:40, c:51, f:13, items:'3 huevos + 60g avena + frambuesas' },
-    { hora:'09:30', nombre:'Snack mañana',           kcal:292, p:31, c:26, f:7,  items:'200g queso cottage · 30g galletas arroz · 1 manzana' },
-    { hora:'13:30', nombre:'Comida (tupper)',         kcal:698, p:48, c:73, f:15, items:'200g pechuga pollo · 160g quinoa cocida · 200g zanahorias · AOVE' },
-    { hora:'17:30', nombre:'Merienda',               kcal:468, p:30, c:57, f:13, items:'2 rebanadas pan integral · 2 lonchas pavo · 1 plátano · almendras 15g' },
-    { hora:'20:15', nombre:'Pre-entreno',            kcal:214, p:22, c:30, f:3,  items:'1 plátano · 30g whey' },
-    { hora:'21:45', nombre:'Cena post-entreno',      kcal:618, p:52, c:47, f:18, items:'200g dorada · 250g boniato · espárragos · AOVE' },
+    { hora:'06:30', nombre:'Desayuno',
+      kcal:510, p:33, c:56, f:14,
+      items:'3 huevos revueltos · 60g avena · 1 plátano · café solo sin azúcar',
+      nota:'Cafeína 60-90 min antes de empezar el día = foco y lipólisis matutina. Combina bien con proteína+HC.' },
+    { hora:'10:00', nombre:'Snack — RÁPIDO ⚡',
+      kcal:255, p:36, c:16, f:4,
+      items:'200g yogur griego 0% + 25g whey · 1 manzana',
+      nota:'Viernes = cuerpo más fatigado acumulado. Proteína cada 3-4h mantiene el MPS aunque estés cansado.' },
+    { hora:'13:30', nombre:'Comida (tupper)',
+      kcal:695, p:49, c:73, f:15,
+      items:'180g pechuga pollo · 180g arroz cocido · 150g zanahoria y pimiento · 15ml AOVE',
+      nota:'Zanahoria = beta-caroteno + fibra soluble. Digestión cómoda para acabar la semana.' },
+    { hora:'18:30', nombre:'Pre-entreno 🔋',
+      kcal:330, p:25, c:52, f:4,
+      items:'25g whey en agua · 1 plátano grande · 60g arroz blanco cocido',
+      nota:'Último entreno de la semana. Carga bien. El fin de semana recuperas — dale caña.' },
+    { hora:'22:00', nombre:'Post-entreno + Cena 💪',
+      kcal:655, p:51, c:53, f:18,
+      items:'[Al llegar: 30g whey + 1 plátano] · 200g dorada al horno · 200g boniato · espinacas + tomate · 10ml AOVE',
+      nota:'Viernes post-entreno = crítico para recuperación del fin de semana. Proteína alta + boniato para recargar.' },
   ]},
+
+  // ─────────────────────────────────────────────────────────────────────
+  // SÁBADO — LISS / Movilidad · Sin entreno de fuerza
+  // Estructura diferente: actividad matutina, carbos más bajos
+  // ─────────────────────────────────────────────────────────────────────
   { dia: 'Sábado', meals: [
-    { hora:'08:00', nombre:'Desayuno (meal prep day)', kcal:520, p:38, c:58, f:14, items:'Tortilla 4 huevos + verduras · 2 tostadas integrales · zumo naranja' },
-    { hora:'11:00', nombre:'Media mañana',             kcal:300, p:28, c:30, f:9,  items:'1 batido whey · 1 plátano · frutos secos 20g' },
-    { hora:'14:00', nombre:'Comida',                   kcal:720, p:50, c:75, f:16, items:'200g solomillo · 200g arroz · ensalada completa · AOVE' },
-    { hora:'17:30', nombre:'Merienda',                 kcal:450, p:28, c:55, f:12, items:'Tostadas integrales · pavo + queso · 1 pera' },
-    { hora:'20:30', nombre:'Cena (libre controlada)',  kcal:500, p:40, c:45, f:15, items:'Libre pero manteniendo objetivo proteína >40g' },
-    { hora:'22:00', nombre:'Post-cena opcional',       kcal:180, p:20, c:18, f:4,  items:'Caseína 30g o queso fresco + canela (si hambre nocturna)' },
+    { hora:'08:00', nombre:'Desayuno pre-LISS',
+      kcal:385, p:28, c:38, f:12,
+      items:'2 huevos + 2 claras a la plancha · 2 tostadas integrales · café con leche desnatada',
+      nota:'Ligero antes del LISS. Sin avena pesada. HC moderados para sostener la actividad cardio sin molestia digestiva.' },
+    { hora:'11:00', nombre:'Post-LISS — RÁPIDO ⚡',
+      kcal:245, p:30, c:22, f:4,
+      items:'30g whey en agua · 1 plátano mediano',
+      nota:'Recuperación rápida post-cardio. Plátano = potasio para prevenir calambres. 2 minutos.' },
+    { hora:'14:00', nombre:'Comida (libre controlada)',
+      kcal:750, p:50, c:68, f:20,
+      items:'Proteína >45g + carbohidrato + verdura. Adapta a la situación: restaurante, casa, familia.',
+      nota:'Sábado = flexibilidad social. Prioriza proteína (filete, pescado, huevos). El resto flexible.' },
+    { hora:'18:00', nombre:'Merienda — RÁPIDO ⚡',
+      kcal:240, p:28, c:20, f:5,
+      items:'150g queso cottage · 1 naranja o pera',
+      nota:'Snack de fin de tarde. Sin complicaciones. Cottage = caseína que te lleva hasta cena.' },
+    { hora:'21:00', nombre:'Cena',
+      kcal:570, p:45, c:42, f:18,
+      items:'200g pechuga pollo o pescado magro · 200g boniato o patata · verduras abundantes · 10ml AOVE',
+      nota:'Sin post-entreno fuerza → cena más moderada en HC. Proteína igual de alta para no perder músculo en descanso.' },
+    { hora:'22:30', nombre:'Proteína nocturna (opcional)',
+      kcal:160, p:20, c:10, f:4,
+      items:'150g queso fresco batido 0% con canela · o 25g caseína en agua',
+      nota:'Si tienes hambre. Caseína = proteína de digestión muy lenta (7-8h). Síntesis proteica máxima mientras duermes.' },
   ]},
+
+  // ─────────────────────────────────────────────────────────────────────
+  // DOMINGO — Descanso activo · Sin entreno
+  // Misma proteína, carbos más bajos, más grasa saludable
+  // ─────────────────────────────────────────────────────────────────────
   { dia: 'Domingo', meals: [
-    { hora:'08:30', nombre:'Desayuno relajado',        kcal:500, p:36, c:58, f:14, items:'3 huevos + tostadas integrales × 2 · fruta fresca' },
-    { hora:'11:30', nombre:'Media mañana',             kcal:280, p:25, c:28, f:9,  items:'Yogur griego + fruta + frutos secos' },
-    { hora:'14:00', nombre:'Comida familiar',          kcal:750, p:50, c:72, f:18, items:'Proteína + carbohidrato + verdura. Adaptar a la situación.' },
-    { hora:'17:30', nombre:'Merienda',                 kcal:400, p:25, c:45, f:12, items:'Fruta · queso + tortitas arroz' },
-    { hora:'21:00', nombre:'Cena ligera',              kcal:450, p:42, c:35, f:14, items:'200g pechuga / pescado · verduras abundantes · AOVE' },
-    { hora:'22:00', nombre:'Proteína nocturna',        kcal:180, p:20, c:18, f:4,  items:'Caseína o queso fresco para síntesis proteica nocturna' },
+    { hora:'09:00', nombre:'Desayuno relajado',
+      kcal:530, p:32, c:48, f:17,
+      items:'3 huevos enteros con jamón serrano (30g) · 2 tostadas integrales · 1 pieza fruta',
+      nota:'Domingo = día de recarga emocional también. Desayuno más relajado, tardío. Jamón aporta proteína sin cocinar nada extra.' },
+    { hora:'12:30', nombre:'Snack media mañana — RÁPIDO ⚡',
+      kcal:235, p:28, c:18, f:6,
+      items:'200g yogur griego 0% · puñado de nueces (20g)',
+      nota:'Nueces en descanso = omega-3 + zinc para recuperación hormonal. En día de entreno no (ralentizan digestión pre-workout).' },
+    { hora:'14:30', nombre:'Comida familiar',
+      kcal:755, p:50, c:65, f:20,
+      items:'Proteína principal >45g + carbohidrato + verdura. Flexible para adaptar a comida familiar.',
+      nota:'Domingo familiar = sin estrés. Sigue el patrón: proteína + HC + verdura. El AOVE cuenta como grasa.' },
+    { hora:'18:30', nombre:'Merienda — RÁPIDO ⚡',
+      kcal:230, p:26, c:18, f:6,
+      items:'2 latas atún en agua · 1 manzana',
+      nota:'Rápido y eficiente. Sin preparación. El atún en lata es uno de los mejores snacks proteicos del mercado.' },
+    { hora:'21:00', nombre:'Cena ligera',
+      kcal:530, p:43, c:38, f:16,
+      items:'200g pechuga o pescado magro · 200g verduras variadas · 150g boniato pequeño · 10ml AOVE',
+      nota:'Domingo noche ligero. Mañana empieza el ciclo. No necesitas recargar fuerte sin haber entrenado.' },
+    { hora:'22:30', nombre:'Proteína nocturna',
+      kcal:160, p:20, c:10, f:4,
+      items:'150g queso fresco batido 0% con canela · o 25g caseína',
+      nota:'Caseína nocturna aumenta la síntesis proteica neta nocturna un 22% (Res et al. 2012). No saltártela en días de descanso.' },
   ]},
 ];
 
@@ -3745,9 +3881,9 @@ function renderNutricion() {
   if (!cont) return;
   cont.innerHTML = dayData.meals.map((m, i) => {
     const done = isToday && state.meals[i];
-    const itemsHtml = m.items ? m.items.split(' · ').map(it =>
+    const itemsHtml = (m.items ? m.items.split(' · ').map(it =>
       `<div class="meal-item-row"><span class="meal-item-name">${it.trim()}</span></div>`
-    ).join('') : '';
+    ).join('') : '') + (m.nota ? `<div style="margin-top:8px;padding:8px 10px;background:rgba(249,115,22,0.06);border-left:2px solid var(--accent);border-radius:0 6px 6px 0;font-size:11px;color:var(--text2);line-height:1.5;">${m.nota}</div>` : '');
     return `
     <div class="meal-item ${done ? 'done' : ''}" id="meal-card-${i}">
       <div class="meal-row" onclick="toggleMealExpand(${i})" style="cursor:pointer;">
