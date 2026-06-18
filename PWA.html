@@ -5466,13 +5466,29 @@ function showWeekDetail(w) {
     const key = schedule[i] || 'rest';
     const ses = sessions[key] || { name: 'Descanso', sub: 'Recuperación activa' };
     const isRest = key === 'rest';
-    return `<div style="display:flex;align-items:center;gap:12px;padding:9px 14px;${i < 6 ? 'border-bottom:1px solid var(--border);' : ''}">
-      <div style="width:28px;font-size:11px;font-weight:700;color:${isRest ? 'var(--muted)' : faseColor};">${d}</div>
-      <div style="flex:1;">
-        <div style="font-size:13px;font-weight:${isRest ? '500' : '700'};color:${isRest ? 'var(--muted)' : 'var(--text)'};">${ses.name}${deload && !isRest ? ' 🔄' : ''}</div>
-        ${ses.sub && !isRest ? `<div style="font-size:10px;color:var(--muted);margin-top:1px;">${ses.sub}</div>` : ''}
-      </div>
-    </div>`;
+    const exs = (!isRest && ses.exercises && ses.exercises.length) ? ses.exercises : null;
+    const hasCardio = !isRest && ses.cardioBlocks && ses.cardioBlocks.length;
+    const hasDrop = exs || hasCardio;
+    const exHtml = exs ? exs.map(e =>
+      `<div style="display:flex;align-items:baseline;gap:8px;padding:5px 0;${exs.indexOf(e) < exs.length-1 ? 'border-bottom:1px solid var(--border);' : ''}">
+        <div style="flex:1;font-size:12px;font-weight:600;color:var(--text);">${e.name}</div>
+        <div style="font-size:11px;color:var(--muted);white-space:nowrap;">${e.sets}×${e.reps} · RIR ${e.rir}</div>
+      </div>`
+    ).join('') : hasCardio ? ses.cardioBlocks.map(cb =>
+      `<div style="font-size:12px;color:var(--text2);padding:4px 0;">${cb.title} · ${(cb.rows[0]||{}).value||''}</div>`
+    ).join('') : '';
+
+    return `<details style="${i < 6 ? 'border-bottom:1px solid var(--border);' : ''}">
+      <summary style="display:flex;align-items:center;gap:12px;padding:10px 14px;cursor:${hasDrop ? 'pointer' : 'default'};list-style:none;">
+        <div style="width:28px;font-size:11px;font-weight:700;color:${isRest ? 'var(--muted)' : faseColor};">${d}</div>
+        <div style="flex:1;">
+          <div style="font-size:13px;font-weight:${isRest ? '500' : '700'};color:${isRest ? 'var(--muted)' : 'var(--text)'};">${ses.name}${deload && !isRest ? ' 🔄' : ''}</div>
+          ${ses.sub && !isRest ? `<div style="font-size:10px;color:var(--muted);margin-top:1px;">${ses.sub}</div>` : ''}
+        </div>
+        ${hasDrop ? `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>` : ''}
+      </summary>
+      ${hasDrop ? `<div style="padding:6px 14px 12px 54px;background:var(--surface);">${exHtml}</div>` : ''}
+    </details>`;
   }).join('');
 
   // Info fase compacta
