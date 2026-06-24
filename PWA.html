@@ -820,6 +820,7 @@ html.dark select.input { background: var(--surface); }
           </div>
           <button class="btn btn-primary btn-block" onclick="guardarBio()">Guardar biométricos</button>
         </div>
+        <div id="bio-last-summary" style="display:none;margin-top:10px;padding:10px 12px;background:var(--surface2);border-radius:10px;font-size:12px;color:var(--text2);line-height:1.8;"></div>
       </div>
     </details>
   </div>
@@ -1189,6 +1190,14 @@ html.dark select.input { background: var(--surface); }
       <div class="stat-lbl">Sesiones</div>
       <div class="stat-delta" id="prg-sesiones-sub" style="color:var(--muted);">totales</div>
     </div>
+    <div class="stat-card" style="grid-column:span 2;">
+      <div style="display:flex;align-items:center;justify-content:space-between;">
+        <div><span class="stat-val" id="prg-sueno">—</span><span class="stat-unit"> h</span></div>
+        <span style="font-size:22px;">🌙</span>
+      </div>
+      <div class="stat-lbl">Sueño (último registro)</div>
+      <div class="stat-delta" id="prg-sueno-delta" style="color:var(--muted);">—</div>
+    </div>
   </div>
 
   <div style="margin:12px 16px 0;">
@@ -1203,12 +1212,14 @@ html.dark select.input { background: var(--surface); }
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
         <div class="chart-title" style="margin-bottom:0;">e1RM — Ejercicio clave</div>
         <select id="e1rm-exercise-select" class="input" style="font-size:11px;padding:5px 8px;width:auto;max-width:160px;" onchange="renderProgreso()">
-          <option value="Press Banca">Press Banca</option>
-          <option value="Press Militar (Barra)">Press Militar</option>
-          <option value="Dominadas (BW)">Dominadas</option>
-          <option value="Remo con Barra (pronado)">Remo Barra</option>
-          <option value="Sentadilla Trasera">Sentadilla</option>
-          <option value="Peso Muerto Convencional">Peso Muerto</option>
+          <option value="Press Banca Barra">Press Banca</option>
+          <option value="Press Inclinado Barra">Press Inclinado</option>
+          <option value="Press Militar Barra">Press Militar</option>
+          <option value="Dominadas Agarre Prono">Dominadas</option>
+          <option value="Remo Barra Pronado">Remo Barra</option>
+          <option value="Sentadilla con Barra">Sentadilla</option>
+          <option value="Peso Muerto Convencional — Barra">Peso Muerto</option>
+          <option value="Hip Thrust Barra">Hip Thrust</option>
         </select>
       </div>
       <canvas id="chart-e1rm"></canvas>
@@ -1293,7 +1304,11 @@ html.dark select.input { background: var(--surface); }
     <div id="photo-gallery" style="display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;"></div>
   </div>
 
-  <div class="section-title">Objetivos del plan</div>
+  <!-- HITOS CON FECHAS -->
+  <div class="section-title">Hitos del plan</div>
+  <div id="milestones-container" style="margin:0 16px;display:flex;flex-direction:column;gap:6px;"></div>
+
+  <div class="section-title" style="margin-top:8px;">Objetivos del plan</div>
   <div class="card" style="margin:0 16px;">
     <div style="padding:14px 16px;display:flex;flex-direction:column;gap:10px;">
       <div>
@@ -1315,6 +1330,19 @@ html.dark select.input { background: var(--surface); }
         <div class="progress-bar"><div id="goal-hrv-bar" class="progress-fill" style="background:var(--green);width:0%"></div></div>
       </div>
     </div>
+  </div>
+
+  <!-- PROGRESIÓN DE PESOS POR EJERCICIO -->
+  <div class="section-title" style="margin-top:8px;display:flex;align-items:center;justify-content:space-between;padding-right:16px;">
+    Progresión de pesos por ejercicio
+    <span style="display:flex;gap:10px;font-size:10px;font-weight:700;">
+      <span style="color:#f97316;">— e1RM</span>
+      <span style="color:#2563eb;">- - Peso máx</span>
+    </span>
+  </div>
+  <div id="pesos-progreso-debug" style="margin:0 16px 8px;padding:10px 12px;background:var(--surface2);border-radius:8px;font-size:11px;color:var(--muted);display:none;word-break:break-all;line-height:1.6;"></div>
+  <div id="pesos-progreso-container" style="display:flex;flex-direction:column;gap:10px;padding-bottom:8px;">
+    <div style="text-align:center;color:var(--muted);font-size:12px;padding:20px 0;">Registra sesiones para ver la progresión</div>
   </div>
 
 </section>
@@ -1386,6 +1414,23 @@ html.dark select.input { background: var(--surface); }
       <div style="display:flex;align-items:center;gap:10px;">
         <input type="time" id="notif-time-input" class="input" value="09:00" style="flex:1;font-size:16px;" onchange="saveNotifTime()">
         <button onclick="cancelTrainingNotification()" style="padding:8px 12px;border-radius:10px;border:1.5px solid rgba(220,38,38,0.25);background:rgba(220,38,38,0.06);font-size:12px;font-weight:700;color:var(--red);cursor:pointer;white-space:nowrap;">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recordatorio creatina/proteína -->
+  <div class="card" style="margin:8px 16px 0;">
+    <div style="padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;">
+      <div>
+        <div style="font-size:14px;font-weight:700;font-family:'Barlow Condensed',sans-serif;">💊 Creatina + Proteína</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:2px;" id="supl-notif-text">Recuérdame tomar suplementos</div>
+      </div>
+      <button id="supl-toggle-btn" onclick="toggleSuplNotif()" style="padding:8px 14px;border-radius:10px;border:1.5px solid var(--border);background:var(--surface2);font-size:12px;font-weight:700;font-family:'Barlow Condensed',sans-serif;color:var(--text2);cursor:pointer;white-space:nowrap;">Activar</button>
+    </div>
+    <div id="supl-time-row" style="display:none;padding:0 16px 14px;">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <input type="time" id="supl-time-input" class="input" value="08:00" style="flex:1;font-size:16px;" onchange="saveSuplTime()">
+        <button onclick="cancelSuplNotif()" style="padding:8px 12px;border-radius:10px;border:1.5px solid rgba(220,38,38,0.25);background:rgba(220,38,38,0.06);font-size:12px;font-weight:700;color:var(--red);cursor:pointer;white-space:nowrap;">Cancelar</button>
       </div>
     </div>
   </div>
@@ -2490,6 +2535,7 @@ function switchTab(tab) {
 // ══════════════════════════════════════════
 
 function renderHoy() {
+  renderBioLastSummary();
   const { day, week, remaining, pct, phase } = getPlanState();
   const now = new Date();
   const dias = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado'];
@@ -2549,6 +2595,27 @@ function updateStreak() {
   }
 }
 
+function renderBioLastSummary() {
+  const el = document.getElementById('bio-last-summary');
+  if (!el) return;
+  const bio = getBio();
+  if (!bio.length) { el.style.display = 'none'; return; }
+  const last = [...bio].reverse()[0];
+  const parts = [];
+  if (last.peso)  parts.push(`⚖️ <b>${last.peso} kg</b>`);
+  if (last.grasa) parts.push(`📊 <b>${last.grasa}%</b> grasa`);
+  if (last.hrv)   parts.push(`❤️ HRV <b>${last.hrv} ms</b>`);
+  if (last.fc)    parts.push(`💓 FC <b>${last.fc} bpm</b>`);
+  if (last.sueno) {
+    const s = last.sueno;
+    const tag = s >= 7.5 ? '✓ óptimo' : s >= 6.5 ? 'mejorable' : '⚠ insuficiente';
+    parts.push(`🌙 Sueño <b>${s}h</b> — ${tag}`);
+  }
+  if (!parts.length) { el.style.display = 'none'; return; }
+  el.innerHTML = '<span style="font-weight:800;color:var(--text);font-size:11px;text-transform:uppercase;letter-spacing:0.06em;">Último registro · ' + (last.fecha || '') + '</span><br>' + parts.join(' &nbsp;·&nbsp; ');
+  el.style.display = 'block';
+}
+
 function guardarBio() {
   const peso  = parseFloat(document.getElementById('bio-peso').value);
   const grasa = parseFloat(document.getElementById('bio-grasa').value);
@@ -2564,6 +2631,7 @@ function guardarBio() {
   document.getElementById('bio-sueno').value = '';
   renderReadinessScore();
   renderAutoAlerts();
+  renderBioLastSummary();
   showToast('✓ Biométricos guardados');
 }
 
@@ -3328,9 +3396,9 @@ function buildDefaultSets(ex) {
 function buildSetRow(exId, si, s) {
   return `<tr>
     <td style="text-align:center;color:var(--muted);font-size:12px;">${si+1}</td>
-    <td><input class="set-input" type="number" value="${s.kg||''}" placeholder="kg" onchange="updateSet('${exId}',${si},'kg',this.value)" oninput="calcE1rmRow('${exId}',${si})"></td>
-    <td><input class="set-input" type="number" value="${s.reps||''}" placeholder="r" onchange="updateSet('${exId}',${si},'reps',this.value)" oninput="calcE1rmRow('${exId}',${si})"></td>
-    <td><input class="set-input" type="number" value="${s.rir||''}" placeholder="rir" onchange="updateSet('${exId}',${si},'rir',this.value)"></td>
+    <td><input class="set-input" type="number" value="${s.kg||''}" placeholder="kg" oninput="updateSet('${exId}',${si},'kg',this.value);calcE1rmRow('${exId}',${si})"></td>
+    <td><input class="set-input" type="number" value="${s.reps||''}" placeholder="r" oninput="updateSet('${exId}',${si},'reps',this.value);calcE1rmRow('${exId}',${si})"></td>
+    <td><input class="set-input" type="number" value="${s.rir||''}" placeholder="rir" oninput="updateSet('${exId}',${si},'rir',this.value)"></td>
     <td><div class="e1rm-display" id="e1rm-${exId}-${si}">${s.kg && s.reps ? calcE1RM(+s.kg,+s.reps).toFixed(1) : '—'}</div></td>
   </tr>`;
 }
@@ -3746,9 +3814,33 @@ function skipRest() {
 }
 
 function guardarSesion() {
-  const prog = PROGRAMS[currentEntrenoDay];
+  const advSess = entrenoMode === 'advanced' ? ADVANCED_SESSIONS.find(s => s.key === currentEntrenoDay) : null;
+  const prog = advSess || PROGRAMS[currentEntrenoDay];
   const exercises = {};
   prog.exercises.forEach(ex => {
+    // Sync DOM values into currentSessionSets before reading
+    const domSets = [];
+    for (let si = 0; ; si++) {
+      const kgEl   = document.querySelector(`input[oninput*="'${ex.id}',${si},'kg'"]`);
+      const repsEl = document.querySelector(`input[oninput*="'${ex.id}',${si},'reps'"]`);
+      const rirEl  = document.querySelector(`input[oninput*="'${ex.id}',${si},'rir'"]`);
+      if (!kgEl) break;
+      domSets.push({ kg: kgEl.value, reps: repsEl ? repsEl.value : '', rir: rirEl ? rirEl.value : '' });
+    }
+    if (domSets.length > 0) {
+      if (!currentSessionSets[ex.id]) currentSessionSets[ex.id] = domSets;
+      else {
+        // Merge: DOM wins for any set index
+        domSets.forEach((ds, i) => {
+          if (!currentSessionSets[ex.id][i]) currentSessionSets[ex.id][i] = ds;
+          else {
+            if (ds.kg)   currentSessionSets[ex.id][i].kg   = ds.kg;
+            if (ds.reps) currentSessionSets[ex.id][i].reps = ds.reps;
+            if (ds.rir)  currentSessionSets[ex.id][i].rir  = ds.rir;
+          }
+        });
+      }
+    }
     const sets = currentSessionSets[ex.id] || [];
     const validSets = sets.filter(s => s.kg || s.reps);
     if (validSets.length) exercises[ex.name] = validSets;
@@ -4062,6 +4154,7 @@ function removeLibre(idx) {
 
 let chartPeso = null;
 let chartE1RM = null;
+let chartsProgreso = {};
 
 // ── FOTOS DE PROGRESO ──────────────────────────────────────────────────────
 let _photoType = 'progreso';
@@ -4244,7 +4337,77 @@ async function renderPhotoSectionAsync() {
     </div>`).join('');
 }
 
+function renderMilestones() {
+  const container = document.getElementById('milestones-container');
+  if (!container) return;
+  const START = new Date('2026-06-22');
+  const today = new Date();
+  const milestones = [
+    { mes: 1, fecha: new Date('2026-07-22'), hito: 'Sueño establecido · Proteína >150g/día' },
+    { mes: 2, fecha: new Date('2026-08-22'), hito: 'Cintura <87cm · Banca 75 kg' },
+    { mes: 3, fecha: new Date('2026-09-22'), hito: 'BF <16% · Fotos comparativas' },
+    { mes: 4, fecha: new Date('2026-10-22'), hito: 'HRV >45ms · Banca 80kg · Dominadas 12 reps' },
+    { mes: 6, fecha: new Date('2026-12-22'), hito: '+4kg músculo · Banca 85-90 kg' },
+    { mes: 7, fecha: new Date('2027-01-22'), hito: 'Abdominales visibles' },
+    { mes: 9, fecha: new Date('2027-03-22'), hito: 'BF 11-12% · Físico Hyrox listo' },
+  ];
+  const saved = JSON.parse(localStorage.getItem('milestone_status') || '{}');
+  const totalDays = (new Date('2027-03-22') - START) / 86400000;
+  const elapsed   = Math.min(totalDays, Math.max(0, (today - START) / 86400000));
+  const planPct   = Math.round(elapsed / totalDays * 100);
+
+  let html = `<div class="card" style="padding:12px 16px 10px;">
+    <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text2);margin-bottom:6px;">
+      <span>22 jun 2026</span><span style="color:var(--accent);font-weight:700;">${planPct}% del plan</span><span>22 mar 2027</span>
+    </div>
+    <div class="progress-bar" style="height:6px;"><div class="progress-fill" style="background:var(--accent);width:${planPct}%;"></div></div>
+  </div>`;
+
+  milestones.forEach(m => {
+    const key = 'mes' + m.mes;
+    const status = saved[key] || 'pending';
+    const past = today > m.fecha;
+    const daysLeft = Math.round((m.fecha - today) / 86400000);
+    const fechaStr = m.fecha.toLocaleDateString('es-ES', { day:'numeric', month:'short', year:'numeric' });
+
+    let color, icon, badge;
+    if (status === 'done') {
+      color = 'var(--green)'; icon = '✅'; badge = `<span style="font-size:9px;color:var(--green);font-weight:800;">CONSEGUIDO</span>`;
+    } else if (status === 'missed') {
+      color = 'var(--red)'; icon = '❌'; badge = `<span style="font-size:9px;color:var(--red);font-weight:800;">PERDIDO</span>`;
+    } else if (past) {
+      color = 'var(--red)'; icon = '⚠️'; badge = `<span style="font-size:9px;color:var(--red);font-weight:800;">VENCIDO</span>`;
+    } else if (daysLeft <= 14) {
+      color = 'var(--yellow)'; icon = '🔥'; badge = `<span style="font-size:9px;color:var(--yellow);font-weight:800;">${daysLeft}d restantes</span>`;
+    } else {
+      color = 'var(--muted)'; icon = '⏳'; badge = `<span style="font-size:9px;color:var(--muted);">en ${daysLeft}d · ${fechaStr}</span>`;
+    }
+
+    html += `<div class="card" style="padding:12px 14px;border-left:3px solid ${color};">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;">
+        <div style="flex:1;min-width:0;">
+          <div style="font-size:10px;font-weight:800;font-family:'Barlow Condensed',sans-serif;text-transform:uppercase;letter-spacing:0.06em;color:${color};">MES ${m.mes} · ${fechaStr}</div>
+          <div style="font-size:13px;font-weight:600;margin-top:2px;">${icon} ${m.hito}</div>
+          <div style="margin-top:4px;">${badge}</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:4px;flex-shrink:0;">
+          <button onclick="setMilestone('${key}','done')" style="padding:4px 8px;border-radius:6px;border:1.5px solid var(--green);background:${status==='done'?'var(--green)':'transparent'};color:${status==='done'?'#fff':'var(--green)'};font-size:10px;font-weight:800;cursor:pointer;">✅</button>
+          <button onclick="setMilestone('${key}','missed')" style="padding:4px 8px;border-radius:6px;border:1.5px solid var(--red);background:${status==='missed'?'var(--red)':'transparent'};color:${status==='missed'?'#fff':'var(--red)'};font-size:10px;font-weight:800;cursor:pointer;">❌</button>
+        </div>
+      </div>
+    </div>`;
+  });
+  container.innerHTML = html;
+}
+function setMilestone(key, val) {
+  const saved = JSON.parse(localStorage.getItem('milestone_status') || '{}');
+  saved[key] = saved[key] === val ? 'pending' : val;
+  localStorage.setItem('milestone_status', JSON.stringify(saved));
+  renderMilestones();
+}
+
 function renderProgreso() {
+  renderMilestones();
   renderVolumeTracker();
   renderPhotoSection();
   const bio = getBio();
@@ -4267,6 +4430,23 @@ function renderProgreso() {
   document.getElementById('prg-grasa').textContent   = latestG  ? latestG.grasa : startGrasa;
   document.getElementById('prg-hrv').textContent     = latestH  ? latestH.hrv   : startHRV;
   document.getElementById('prg-sesiones').textContent = sessions.length;
+
+  const latestS = [...bio].reverse().find(b => b.sueno);
+  const suenoEl = document.getElementById('prg-sueno');
+  const suenoDelta = document.getElementById('prg-sueno-delta');
+  if (suenoEl) {
+    if (latestS && latestS.sueno) {
+      suenoEl.textContent = latestS.sueno;
+      const s = latestS.sueno;
+      if (suenoDelta) {
+        suenoDelta.textContent = s >= 7.5 ? '✓ Óptimo' : s >= 6.5 ? 'Mejorable' : '⚠ Insuficiente';
+        suenoDelta.style.color = s >= 7.5 ? 'var(--green)' : s >= 6.5 ? 'var(--yellow)' : 'var(--red)';
+      }
+    } else {
+      suenoEl.textContent = '—';
+      if (suenoDelta) suenoDelta.textContent = 'Sin datos aún';
+    }
+  }
 
   if (latest && latest.peso) {
     const delta = (latest.peso - startPeso).toFixed(2);
@@ -4378,6 +4558,98 @@ function renderProgreso() {
 
   // Informe semanal de progresión
   renderWeeklyReport();
+
+  renderPesosProgreso();
+}
+
+function renderPesosProgreso() {
+  const cont = document.getElementById('pesos-progreso-container');
+  if (!cont) return;
+
+  Object.values(chartsProgreso).forEach(c => { try { c.destroy(); } catch(e) {} });
+  chartsProgreso = {};
+
+  const sessions = getSessions();
+  const dbg = document.getElementById('pesos-progreso-debug');
+  if (dbg) {
+    dbg.style.display = 'block';
+    dbg.textContent = `Sesiones guardadas: ${sessions.length}. ` +
+      (sessions.length ? `Última: ${sessions[sessions.length-1].fecha} | Ejercicios: ${Object.keys(sessions[sessions.length-1].exercises||{}).join(', ')}` : '');
+  }
+  if (!sessions.length) return;
+
+  // Collect all exercise names with data
+  const exMap = {};
+  [...sessions].sort((a, b) => (a.fecha || '').localeCompare(b.fecha || '')).forEach(s => {
+    if (!s.exercises) return;
+    Object.entries(s.exercises).forEach(([name, sets]) => {
+      if (!exMap[name]) exMap[name] = [];
+      const validSets = sets.filter(s => +s.kg > 0 && +s.reps > 0);
+      if (!validSets.length) return;
+      const maxKg = Math.max(...validSets.map(s => +s.kg));
+      const e1rm = Math.max(...validSets.map(s => calcE1RM(+s.kg, +s.reps)));
+      exMap[name].push({ fecha: s.fecha, maxKg, e1rm });
+    });
+  });
+
+  const exNames = Object.keys(exMap).filter(n => exMap[n].length > 0);
+  if (!exNames.length) {
+    cont.innerHTML = '<div style="text-align:center;color:var(--muted);font-size:12px;padding:20px 0;">Registra sesiones para ver la progresión</div>';
+    return;
+  }
+
+  const chartBaseCfg = {
+    animation: false, responsive: true, maintainAspectRatio: true,
+    interaction: { mode: 'index', intersect: false },
+    plugins: { legend: { display: false } },
+    scales: {
+      x: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#64748b', font: { size: 9 }, maxRotation: 45 } },
+      y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#64748b', font: { size: 9 }, callback: v => v + ' kg' }, beginAtZero: false }
+    }
+  };
+
+  cont.innerHTML = exNames.map(n => {
+    const id = 'pgchart-' + n.replace(/[^a-z0-9]/gi, '_');
+    return `<div class="chart-card" style="margin:0 16px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+        <div class="chart-title" style="margin-bottom:0;">${n}</div>
+      </div>
+      <canvas id="${id}" style="max-height:140px;"></canvas>
+    </div>`;
+  }).join('');
+
+  setTimeout(() => {
+    exNames.forEach(name => {
+      const pts = exMap[name];
+      const id = 'pgchart-' + name.replace(/[^a-z0-9]/gi, '_');
+      const canvas = document.getElementById(id);
+      if (!canvas) return;
+      chartsProgreso[name] = new Chart(canvas, {
+        type: 'line',
+        data: {
+          labels: pts.map(p => (p.fecha || '').slice(5)),
+          datasets: [
+            {
+              label: 'e1RM',
+              data: pts.map(p => +p.e1rm.toFixed(1)),
+              borderColor: '#f97316',
+              backgroundColor: 'rgba(249,115,22,0.08)',
+              tension: 0.3, fill: true, pointRadius: 3, borderWidth: 2
+            },
+            {
+              label: 'Peso máx',
+              data: pts.map(p => p.maxKg),
+              borderColor: '#2563eb',
+              backgroundColor: 'transparent',
+              tension: 0.3, fill: false, pointRadius: 3, borderWidth: 2,
+              borderDash: [4, 3]
+            }
+          ]
+        },
+        options: chartBaseCfg
+      });
+    });
+  }, 50);
 }
 
 function renderKeyExercisesHistory() {
@@ -6437,6 +6709,8 @@ document.addEventListener('DOMContentLoaded', () => {
   renderReadinessScore();
   updateNotifUI();
   scheduleTrainingNotification();
+  updateSuplUI();
+  scheduleSuplNotif();
 
   // Apply saved dark mode preference
   if (localStorage.getItem('darkMode') === '1') {
@@ -6543,6 +6817,81 @@ function scheduleTrainingNotification() {
 }
 
 // ══════════════════════════════════════════
+// SUPLEMENTOS NOTIF
+// ══════════════════════════════════════════
+let suplTimer = null;
+async function toggleSuplNotif() {
+  if (!('Notification' in window)) { showToast('Tu navegador no soporta notificaciones'); return; }
+  const enabled = localStorage.getItem('suplNotifEnabled') === '1';
+  if (enabled) { cancelSuplNotif(); return; }
+  let perm = Notification.permission;
+  if (perm === 'default') perm = await Notification.requestPermission();
+  if (perm !== 'granted') { showToast('Permiso denegado'); return; }
+  localStorage.setItem('suplNotifEnabled', '1');
+  scheduleSuplNotif();
+  updateSuplUI();
+  showToast('Recordatorio de suplementos activado');
+}
+function saveSuplTime() {
+  const input = document.getElementById('supl-time-input');
+  if (!input) return;
+  localStorage.setItem('suplNotifTime', input.value);
+  scheduleSuplNotif();
+  updateSuplUI();
+  showToast('Hora actualizada: ' + input.value);
+}
+function cancelSuplNotif() {
+  localStorage.setItem('suplNotifEnabled', '0');
+  clearTimeout(suplTimer);
+  updateSuplUI();
+  showToast('Recordatorio cancelado');
+}
+function scheduleSuplNotif() {
+  clearTimeout(suplTimer);
+  if (localStorage.getItem('suplNotifEnabled') !== '1') return;
+  if (Notification.permission !== 'granted') return;
+  const time = localStorage.getItem('suplNotifTime') || '08:00';
+  const [hh, mm] = time.split(':').map(Number);
+  const now = new Date();
+  const target = new Date();
+  target.setHours(hh, mm, 0, 0);
+  if (target <= now) target.setDate(target.getDate() + 1);
+  suplTimer = setTimeout(() => {
+    new Notification('💊 Suplementos', {
+      body: 'Creatina 5g + Proteína. ¡No te olvides!',
+      icon: 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="22" fill="%23f97316"/><text y=".9em" font-size="72" x="14">💊</text></svg>',
+      tag: 'transfisica-supl',
+    });
+    scheduleSuplNotif();
+  }, target - now);
+}
+function updateSuplUI() {
+  const enabled = localStorage.getItem('suplNotifEnabled') === '1';
+  const btn  = document.getElementById('supl-toggle-btn');
+  const row  = document.getElementById('supl-time-row');
+  const text = document.getElementById('supl-notif-text');
+  const timeInp = document.getElementById('supl-time-input');
+  if (!btn) return;
+  if (enabled) {
+    btn.textContent = 'Activado';
+    btn.style.background = 'rgba(22,163,74,0.1)';
+    btn.style.color = 'var(--green)';
+    btn.style.borderColor = 'rgba(22,163,74,0.3)';
+    if (row) row.style.display = 'block';
+    const t = localStorage.getItem('suplNotifTime') || '08:00';
+    if (text) text.textContent = 'Recordatorio a las ' + t;
+    if (timeInp) timeInp.value = t;
+  } else {
+    btn.textContent = 'Activar';
+    btn.style.background = 'var(--surface2)';
+    btn.style.color = 'var(--text2)';
+    btn.style.borderColor = 'var(--border)';
+    if (row) row.style.display = 'none';
+    if (text) text.textContent = 'Recuérdame tomar suplementos';
+  }
+}
+
+// ══════════════════════════════════════════
 // DARK MODE
 // ══════════════════════════════════════════
 
@@ -6645,39 +6994,97 @@ function renderReadinessScore() {
 // ══════════════════════════════════════════
 
 const MUSCLE_MAP = {
-  'Press Banca':                    'Pecho',
-  'Press Inclinado con Barra':      'Pecho',
-  'Press Inclinado Mancuernas':     'Pecho',
-  'Aperturas en Polea Baja':        'Pecho',
-  'Cruces en Polea':                'Pecho',
-  'Press Militar (Barra)':          'Hombros',
-  'Press Arnold':                   'Hombros',
-  'Elevaciones Laterales':          'Hombros',
-  'Elevaciones Laterales Polea':    'Hombros',
-  'Face Pull con Polea':            'Hombros',
-  'Dominadas (BW)':                 'Espalda',
-  'Jalón al Pecho (Agarre Prono)':  'Espalda',
-  'Jalón al Pecho (Agarre Supino)': 'Espalda',
-  'Remo con Barra (pronado)':       'Espalda',
-  'Remo Inclinado Mancuerna':       'Espalda',
-  'Remo en Máquina':                'Espalda',
-  'Pull-Over en Polea':             'Espalda',
-  'Curl Bíceps Barra':              'Bíceps',
-  'Curl Predicador':                'Bíceps',
-  'Curl Araña':                     'Bíceps',
-  'Press Francés':                  'Tríceps',
-  'Extensión Tríceps Polea Alta':   'Tríceps',
-  'Fondos en Paralelas':            'Tríceps',
-  'Sentadilla Trasera':             'Cuádriceps',
-  'Prensa 45°':                     'Cuádriceps',
-  'Extensión Cuádriceps Máquina':   'Cuádriceps',
-  'Zancadas con Barra':             'Cuádriceps',
-  'Peso Muerto Convencional':       'Isquios',
-  'Peso Muerto Rumano':             'Isquios',
-  'Curl Femoral Tumbado':           'Isquios',
-  'Hip Thrust':                     'Glúteos',
-  'Sentadilla Búlgara':             'Glúteos',
-  'Patada de Glúteo en Polea':      'Glúteos',
+  // ── PECHO ──────────────────────────────────────────────────
+  'Press Banca':                                    'Pecho',
+  'Press Banca Barra':                              'Pecho',
+  'Press Inclinado con Barra':                      'Pecho',
+  'Press Inclinado Barra':                          'Pecho',
+  'Press Inclinado Mancuernas':                     'Pecho',
+  'Press Inclinado Mancuernas 30° — Post-fatiga':   'Pecho',
+  'Press Banca Mancuernas — Agarre Neutro':         'Pecho',
+  'Aperturas en Polea Baja':                        'Pecho',
+  'Aperturas Polea Alta':                           'Pecho',
+  'Fly Mancuernas — Banco Inclinado 30°':           'Pecho',
+  'Cruces en Polea':                                'Pecho',
+  // ── HOMBROS ────────────────────────────────────────────────
+  'Press Militar (Barra)':                          'Hombros',
+  'Press Militar Barra':                            'Hombros',
+  'Press Militar Mancuernas — Sentado':             'Hombros',
+  'Press Arnold':                                   'Hombros',
+  'Elevaciones Laterales':                          'Hombros',
+  'Elevaciones Laterales Polea':                    'Hombros',
+  'Elevaciones Laterales Mancuerna':                'Hombros',
+  'Elevación Lateral Polea Baja — unilateral':      'Hombros',
+  'Elevación Lateral Mancuerna — Mechanical Drop Set': 'Hombros',
+  'Face Pull con Polea':                            'Hombros',
+  'Face Pull Polea Alta':                           'Hombros',
+  'Face Pull Polea Alta — Rotación Externa':        'Hombros',
+  'Pájaros — Mancuernas o Polea':                   'Hombros',
+  // ── ESPALDA ────────────────────────────────────────────────
+  'Dominadas (BW)':                                 'Espalda',
+  'Dominadas Agarre Prono':                         'Espalda',
+  'Dominadas — Agarre Prono Ancho':                 'Espalda',
+  'Fondos Lastrados':                               'Espalda',
+  'Jalón al Pecho (Agarre Prono)':                  'Espalda',
+  'Jalón al Pecho (Agarre Supino)':                 'Espalda',
+  'Jalón Agarre Neutro':                            'Espalda',
+  'Jalón Polea Alta — Agarre Ancho Prono':          'Espalda',
+  'Remo con Barra (pronado)':                       'Espalda',
+  'Remo Barra Pronado':                             'Espalda',
+  'Remo Mancuerna 1 Brazo':                         'Espalda',
+  'Remo Mancuerna — Un Brazo':                      'Espalda',
+  'Remo Inclinado Mancuerna':                       'Espalda',
+  'Remo en Máquina':                                'Espalda',
+  'Remo Polea Baja — Agarre Estrecho Supino':       'Espalda',
+  'Remo en Polea — Agarre Ancho Horizontal':        'Espalda',
+  'Pull-Over en Polea':                             'Espalda',
+  'Pullover Polea Alta':                            'Espalda',
+  'Pullover Mancuerna — Banco Transversal':         'Espalda',
+  // ── BÍCEPS ─────────────────────────────────────────────────
+  'Curl Bíceps Barra':                              'Bíceps',
+  'Curl Barra':                                     'Bíceps',
+  'Curl Predicador':                                'Bíceps',
+  'Curl Araña':                                     'Bíceps',
+  'Curl Inclinado Mancuernas':                      'Bíceps',
+  'Curl Inclinado Mancuernas — Banco 45°':          'Bíceps',
+  'Curl Bíceps Polea Baja — Bilateral':             'Bíceps',
+  'Curl Martillo Mancuernas':                       'Bíceps',
+  'Curl Martillo Mancuernas — Alterno':             'Bíceps',
+  // ── TRÍCEPS ────────────────────────────────────────────────
+  'Press Francés':                                  'Tríceps',
+  'Press Francés Barra EZ':                         'Tríceps',
+  'Extensión Tríceps Polea Alta':                   'Tríceps',
+  'Extensión Tríceps Polea Alta — Cuerda':          'Tríceps',
+  'Extensión Tríceps Overhead — Mancuerna/Polea':   'Tríceps',
+  'Fondos en Paralelas':                            'Pecho',
+  // ── CUÁDRICEPS ─────────────────────────────────────────────
+  'Sentadilla Trasera':                             'Cuádriceps',
+  'Sentadilla con Barra':                           'Cuádriceps',
+  'Sentadilla con Barra — Profunda (ATG)':          'Cuádriceps',
+  'Prensa 45°':                                     'Cuádriceps',
+  'Extensión Cuádriceps Máquina':                   'Cuádriceps',
+  'Extensión Cuádriceps Polea':                     'Cuádriceps',
+  'Zancadas con Barra':                             'Cuádriceps',
+  'Zancadas con Mancuernas':                        'Cuádriceps',
+  'Goblet Squat':                                   'Cuádriceps',
+  'Step-Up Mancuernas — Banco Alto':                'Cuádriceps',
+  // ── ISQUIOS ────────────────────────────────────────────────
+  'Peso Muerto Convencional':                       'Isquios',
+  'Peso Muerto Convencional — Barra':               'Isquios',
+  'Peso Muerto Rumano':                             'Isquios',
+  'RDL Mancuernas — Con Pausa 2s':                  'Isquios',
+  'Curl Femoral Tumbado':                           'Isquios',
+  'Curl Femoral Polea de Pie':                      'Isquios',
+  'Curl Femoral de Pie Polea — unilateral':         'Isquios',
+  'Good Morning — Barra':                           'Isquios',
+  // ── GLÚTEOS ────────────────────────────────────────────────
+  'Hip Thrust':                                     'Glúteos',
+  'Hip Thrust Barra':                               'Glúteos',
+  'Hip Thrust — Barra':                             'Glúteos',
+  'Hip Thrust (barra)':                             'Glúteos',
+  'Sentadilla Búlgara':                             'Glúteos',
+  'Zancada Búlgara — Mancuernas':                   'Glúteos',
+  'Patada de Glúteo en Polea':                      'Glúteos',
 };
 
 const MUSCLE_TARGETS = {
