@@ -4570,12 +4570,6 @@ function renderPesosProgreso() {
   chartsProgreso = {};
 
   const sessions = getSessions();
-  const dbg = document.getElementById('pesos-progreso-debug');
-  if (dbg) {
-    dbg.style.display = 'block';
-    dbg.textContent = `Sesiones guardadas: ${sessions.length}. ` +
-      (sessions.length ? `Última: ${sessions[sessions.length-1].fecha} | Ejercicios: ${Object.keys(sessions[sessions.length-1].exercises||{}).join(', ')}` : '');
-  }
   if (!sessions.length) return;
 
   // Collect all exercise names with data
@@ -4584,10 +4578,10 @@ function renderPesosProgreso() {
     if (!s.exercises) return;
     Object.entries(s.exercises).forEach(([name, sets]) => {
       if (!exMap[name]) exMap[name] = [];
-      const validSets = sets.filter(s => +s.kg > 0 && +s.reps > 0);
+      const validSets = sets.filter(s => +s.reps > 0);
       if (!validSets.length) return;
-      const maxKg = Math.max(...validSets.map(s => +s.kg));
-      const e1rm = Math.max(...validSets.map(s => calcE1RM(+s.kg, +s.reps)));
+      const maxKg = Math.max(...validSets.map(s => +s.kg || 0));
+      const e1rm = Math.max(...validSets.map(s => calcE1RM(+s.kg || 0, +s.reps)));
       exMap[name].push({ fecha: s.fecha, maxKg, e1rm });
     });
   });
@@ -4634,7 +4628,7 @@ function renderPesosProgreso() {
               data: pts.map(p => +p.e1rm.toFixed(1)),
               borderColor: '#f97316',
               backgroundColor: 'rgba(249,115,22,0.08)',
-              tension: 0.3, fill: true, pointRadius: 3, borderWidth: 2
+              tension: 0.3, fill: true, pointRadius: pts.length === 1 ? 6 : 3, borderWidth: 2
             },
             {
               label: 'Peso máx',
